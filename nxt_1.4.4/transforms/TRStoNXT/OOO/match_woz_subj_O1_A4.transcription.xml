@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nite:root xmlns:nite="http://nite.sourceforge.net/" nite:id="match_woz_subj_O1_A4.">
+<trans scribe="(unknown)" audio_filename="match_woz_subj_O1_A4" version="2" version_date="070528" nite:id="match_woz_subj_O1_A4.trans.1">
+<speakers nite:id="match_woz_subj_O1_A4.speakers.1">
+<speaker id="spk1" name="wizard" check="no" type="female" dialect="native" accent="" scope="local" nite:id="match_woz_subj_O1_A4.speaker.1"/>
+<speaker id="spk2" name="user" check="no" type="male" dialect="native" accent="" scope="local" nite:id="match_woz_subj_O1_A4.speaker.2"/>
+</speakers>
+<episode nite:id="match_woz_subj_O1_A4.episode.1">
+<section type="report" starttime="0" endtime="104.908" nite:id="match_woz_subj_O1_A4.section.1">
+<turn starttime="0" endtime="19.135" speaker="spk1" mode="planned" nite:id="match_woz_subj_O1_A4.turn.1">
+<sync time="0" nite:id="match_woz_subj_O1_A4.sync.1"/>
+garbage
+<sync time="18.522" nite:id="match_woz_subj_O1_A4.sync.2"/>
+
+</turn>
+<turn speaker="spk2" mode="spontaneous" starttime="19.135" endtime="19.635" nite:id="match_woz_subj_O1_A4.turn.2">
+<sync time="19.135" nite:id="match_woz_subj_O1_A4.sync.3"/>
+Morning.
+</turn>
+<turn speaker="spk1" mode="spontaneous" starttime="19.635" endtime="29.228" nite:id="match_woz_subj_O1_A4.turn.3">
+<sync time="19.635" nite:id="match_woz_subj_O1_A4.sync.4"/>
+
+</turn>
+<turn speaker="spk2" mode="spontaneous" starttime="29.228" endtime="31.385" nite:id="match_woz_subj_O1_A4.turn.4">
+<sync time="29.228" nite:id="match_woz_subj_O1_A4.sync.5"/>
+Uh physiotherapist please, good morning.
+</turn>
+<turn speaker="spk1" mode="spontaneous" starttime="31.385" endtime="39.76" nite:id="match_woz_subj_O1_A4.turn.5">
+<sync time="31.385" nite:id="match_woz_subj_O1_A4.sync.6"/>
+
+</turn>
+<turn speaker="spk2" mode="spontaneous" starttime="39.76" endtime="47.068" nite:id="match_woz_subj_O1_A4.turn.6">
+<sync time="39.76" nite:id="match_woz_subj_O1_A4.sync.7"/>
+I can't make Wednesday afternoon, but I can make Thursday afternoon, but it would need to be after two thirty. Thursday afternoon, after two thirty, please.
+</turn>
+<turn speaker="spk1" mode="spontaneous" starttime="47.068" endtime="54.565" nite:id="match_woz_subj_O1_A4.turn.7">
+<sync time="47.068" nite:id="match_woz_subj_O1_A4.sync.8"/>
+
+</turn>
+<turn speaker="spk1 spk2" mode="spontaneous" starttime="54.565" endtime="55.221" nite:id="match_woz_subj_O1_A4.turn.8">
+<sync time="54.565" nite:id="match_woz_subj_O1_A4.sync.9"/>
+<who nb="1" nite:id="match_woz_subj_O1_A4.who.1"/>
+
+<who nb="2" nite:id="match_woz_subj_O1_A4.who.2"/>
+Three o'clock.
+</turn>
+<turn speaker="spk1" mode="spontaneous" starttime="55.221" endtime="57.691" nite:id="match_woz_subj_O1_A4.turn.9">
+<sync time="55.221" nite:id="match_woz_subj_O1_A4.sync.10"/>
+
+</turn>
+<turn speaker="spk2" mode="spontaneous" starttime="57.691" endtime="60.818" nite:id="match_woz_subj_O1_A4.turn.10">
+<sync time="57.691" nite:id="match_woz_subj_O1_A4.sync.11"/>
+Sorry? Can you repeat that please?
+</turn>
+<turn speaker="spk1" mode="spontaneous" starttime="60.818" endtime="66.505" nite:id="match_woz_subj_O1_A4.turn.11">
+<sync time="60.818" nite:id="match_woz_subj_O1_A4.sync.12"/>
+
+</turn>
+<turn speaker="spk2" mode="spontaneous" starttime="66.505" endtime="67.974" nite:id="match_woz_subj_O1_A4.turn.12">
+<sync time="66.505" nite:id="match_woz_subj_O1_A4.sync.13"/>
+Three P_M_ is fine, thank you.
+</turn>
+<turn speaker="spk1" mode="spontaneous" starttime="67.974" endtime="81.859" nite:id="match_woz_subj_O1_A4.turn.13">
+<sync time="67.974" nite:id="match_woz_subj_O1_A4.sync.14"/>
+
+</turn>
+<turn speaker="spk2" mode="spontaneous" starttime="81.859" endtime="86.304" nite:id="match_woz_subj_O1_A4.turn.14">
+<sync time="81.859" nite:id="match_woz_subj_O1_A4.sync.15"/>
+Thursday three P_M_, physio, w- the G_P_ practice, that's correct, thank you.
+</turn>
+<turn speaker="spk1" mode="spontaneous" starttime="86.304" endtime="93.428" nite:id="match_woz_subj_O1_A4.turn.15">
+<sync time="86.304" nite:id="match_woz_subj_O1_A4.sync.16"/>
+
+</turn>
+<turn speaker="spk2" mode="spontaneous" starttime="93.428" endtime="104.908" nite:id="match_woz_subj_O1_A4.turn.16">
+<sync time="93.428" nite:id="match_woz_subj_O1_A4.sync.17"/>
+You're welcome, thank you, goodbye.
+<sync time="94.995" nite:id="match_woz_subj_O1_A4.sync.18"/>
+garbage
+</turn>
+</section>
+</episode>
+</trans>
+</nite:root>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<gtype nite:id="g_1" type="gesture" xmlns:nite="http://nite.sourceforge.net/">
+   <gtype nite:id="g_2" type="discursive">
+      <gtype nite:id="g_3" type="baton-like"/>
+      <gtype nite:id="g_4" type="ideographic"/>
+   </gtype>
+   <gtype nite:id="g_5" type="topographic">
+      <gtype nite:id="g_6" type="deictic"/>
+      <gtype nite:id="g_7" type="physiographic">
+         <gtype nite:id="g_8" type="iconographic"/>
+         <gtype nite:id="g_9" type="kinetographic"/>
+      </gtype>
+   </gtype>
+</gtype>

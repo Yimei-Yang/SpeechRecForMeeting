@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- <!DOCTYPE corpus SYSTEM "meta-standoff.dtd"> -->
+
+<!-- v1.0 -->
+
+<corpus description="Hebrew Bible" id="hb" links="ltxml1" type="standoff">
+    <!-- GENERIC CORPUS INFORMATION -->
+	<reserved-attributes>
+		<identifier name="nite:id"/>
+		<starttime name="nite:s"/>
+		<endtime name="nite:e"/>
+	</reserved-attributes>
+	<reserved-elements>
+		<pointername name="nite:pointer"/>
+		<child name="nite:child"/>
+		<stream name="nite:stream"/>
+	</reserved-elements>
+	
+	<!-- Ontologies -->
+	<ontologies path="../xml/Genesis">
+		<ontology description='lexicon ontology' name='lexicon' element-name='lex' attribute-name='lexentry'>
+			<attribute name='lemma' value-type='string'/>
+			<attribute name='pos' value-type='string'/>
+			<attribute name='KBL' value-type='number'/>
+			<attribute name='gloss' value-type='string'/>
+			<attribute name='voice' value-type='enumerated'>
+					<value>q</value>
+					<value>p</value>
+					<value>P</value>
+					<value>n</value>
+					<value>h</value>
+					<value>H</value>
+					<value>Q</value>
+					<value>t</value>
+					<value>b</value>
+					<value>a</value>
+					<value>c</value>
+					<value>d</value>
+					<value>e</value>
+					<value>k</value>
+					<value>m</value>
+					<value>f</value>
+					<value>g</value>
+					<value>i</value>
+					<value>l</value>
+					<value>u</value>
+					<value>b</value>
+					<value>w</value>
+					<value>s</value>
+					<value>x</value>
+					<value>A</value>
+					<value>B</value>
+					<value>H</value>
+					<value>S</value>
+					<value>F</value>
+					<value>G</value>
+					<value>I</value>
+					<value>L</value>
+					<value>P</value>
+					<value>R</value>
+					<value>N</value>
+					<value>M</value>
+					<value>O</value>
+					<value>D</value>
+					<value>Q</value>
+					<value>K</value>
+					<value>V</value>
+			</attribute>
+		</ontology>
+	</ontologies>
+	
+	<!-- Codings -->
+	<codings path="../xml/Genesis">
+		<interaction-codings>
+			<coding-file name="wordpart">
+				<time-aligned-layer name="wordpart-layer">
+					<code name="w" text-content="true">
+						<attribute name="pos" value-type="enumerated">
+							<value>Pa</value>
+							<value>Pc</value>
+							<value>Pd</value>
+							<value>Pg</value>
+							<value>Pi</value>
+							<value>Pn</value>
+							<value>Po</value>
+							<value>Pp</value>
+							<value>Pr</value>
+							<value>pg</value>
+							<value>pi</value>
+							<value>np</value>
+							<value>nc</value>
+							<value>ng</value>
+							<value>a</value>
+							<value>v</value>
+						</attribute>
+						<attribute name="phonetic" value-type="string"/>
+						<attribute name="lang" value-type="string"/>
+						<attribute name="lemma" value-type="string"/>
+						<attribute name="voice" value-type="string"/>
+						<attribute name="KBL" value-type="string"/>
+						<pointer number="1" role="TYPE" target="lexicon"/>						
+					</code>
+				</time-aligned-layer>
+			</coding-file>
+			
+			<coding-file name="book">
+				<structural-layer name="book-layer" points-to="chapter-layer">
+					<code name="book">
+						<attribute name ="book-name" value-type="enumerated">
+							<value>Gen</value>
+							<value>Exo</value>
+							<value>Lev</value>
+							<value>Nam</value>
+							<value>Deu</value>
+							<value>Jos</value>
+							<value>Jdg</value>
+							<value>1Sa</value>
+							<value>2Sa</value>
+							<value>1Ki</value>
+							<value>2Ki</value>
+							<value>Isa</value>
+							<value>Jer</value>
+							<value>Eze</value>
+							<value>Hos</value>
+							<value>Joe</value>
+							<value>Amo</value>
+							<value>Oba</value>
+							<value>Jon</value>
+							<value>Mic</value>
+							<value>Nah</value>
+							<value>Hab</value>
+							<value>Zep</value>
+							<value>Hag</value>
+							<value>Zec</value>
+							<value>Mal</value>
+							<value>1Ch</value>
+							<value>2Ch</value>
+							<value>Psa</value>
+							<value>Job</value>
+							<value>Pro</value>
+							<value>Rut</value>
+							<value>Sol</value>
+							<value>Ecc</value>
+							<value>Lam</value>
+							<value>Est</value>
+							<value>Dan</value>
+							<value>Ezr</value>
+							<value>Neh</value>
+						</attribute>
+					</code>
+				</structural-layer>
+				<structural-layer name="chapter-layer" points-to="verse-layer">
+					<code name="chapter">
+						<attribute name="chapter-number" value-type="number"/>
+					</code>
+				</structural-layer>
+				<structural-layer name="verse-layer" points-to="wordpart-layer">
+					<code name="verse">
+						<attribute name="verse-number" value-type="number"/>
+					</code>
+				</structural-layer>
+			</coding-file>
+			
+			<coding-file name="grapheme">
+				<structural-layer name="grapheme-layer" points-to="wordpart-layer">
+					<code name="grapheme">
+						<attribute name="grapheme-number" value-type="number"/>
+					</code>
+				</structural-layer>
+			</coding-file>
+
+			<coding-file name="WTS">
+				<structural-layer name="WTS-layer" points-to="wordpart-layer">
+					<code name="WTS" text-content="true">
+						<attribute name="rawWTS" value-type="string"/>
+						<attribute name='wordWTS' value-type="number"/>
+					</code>
+				</structural-layer>
+			</coding-file>	
+			
+		</interaction-codings>
+	</codings>
+	
+    <observations>
+        <observation name='Gen'/>
+<!--
+		<observation name='Exo'/>
+		<observation name='Lev'/>
+		<observation name='Nam'/>
+		<observation name='Deu'/>
+		<observation name='Jos'/>
+		<observation name='Jdg'/>
+		<observation name='1Sa'/>
+		<observation name='2Sa'/>
+		<observation name='1Ki'/>
+		<observation name='2Ki'/>
+		<observation name='Isa'/>
+		<observation name='Jer'/>
+		<observation name='Eze'/>
+		<observation name='Hos'/>
+		<observation name='Joe'/>
+		<observation name='Amo'/>
+		<observation name='Oba'/>
+		<observation name='Jon'/>
+		<observation name='Mic'/>
+		<observation name='Nah'/>
+		<observation name='Hab'/>
+		<observation name='Zep'/>
+		<observation name='Hag'/>
+		<observation name='Zec'/>
+		<observation name='Mal'/>
+		<observation name='1Ch'/>
+		<observation name='2Ch'/>
+		<observation name='Psa'/>
+		<observation name='Job'/>
+		<observation name='Pro'/>
+		<observation name='Rut'/>
+		<observation name='Sol'/>
+		<observation name='Ecc'/>
+		<observation name='Lam'/>
+		<observation name='Est'/>
+		<observation name='Dan'/>
+		<observation name='Ezr'/>
+		<observation name='Neh'/>
+-->
+    </observations>
+    
+</corpus>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ptype name="posture" xmlns:nite="http://nite.sourceforge.net/" nite:id="pt_0">
+	<ptype nite:id="pt_1" name="leaning-forward"/>	
+	<ptype nite:id="pt_2" name="leaning-backward"/>	
+	<ptype nite:id="pt_3" name="leaning-left"/>	
+	<ptype nite:id="pt_4" name="leaning-right"/>	
+	<ptype nite:id="pt_5" name="straight"/>	
+</ptype>

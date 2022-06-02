@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nite:root xmlns:nite="http://nite.sourceforge.net/" nite:id="groot1">
+	<gesture nite:id="g_0" nite:start="0.639999985" nite:end="1.799999952" hand="both">
+		<nite:pointer href="gtypes.xml#gt_15" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_1" nite:start="2.200000047" nite:end="2.6400001040000003" hand="both">
+		<nite:pointer href="gtypes.xml#gt_15" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_2" nite:start="2.920000076" nite:end="3.559999942" hand="both">
+		<nite:pointer href="gtypes.xml#gt_15" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_3" nite:start="5.599999904000001" nite:end="6.199999809" hand="both">
+		<nite:pointer href="gtypes.xml#gt_15" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_4" nite:start="6.559999942" nite:end="7.360000133000001" hand="both">
+		<nite:pointer href="gtypes.xml#gt_15" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_5" nite:start="7.920000076000001" nite:end="9.80000019">
+		<nite:pointer href="gtypes.xml#gt_11" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_6" nite:start="9.80000019" nite:end="10.399999618">
+		<nite:pointer href="gtypes.xml#gt_17" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_7" nite:start="12.079999923" nite:end="14.520000457">
+		<nite:pointer href="gtypes.xml#gt_11" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_8" nite:start="16.159999847" nite:end="16.479999542">
+		<nite:pointer href="gtypes.xml#gt_15" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_9" nite:start="16.840000152" nite:end="17.280000686" hand="both">
+		<nite:pointer href="gtypes.xml#gt_15" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_10" nite:start="17.840000152" nite:end="19.559999465" hand="both">
+		<nite:pointer href="gtypes.xml#gt_17" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_11" nite:start="20.079999923000003" nite:end="21.760000228000003" hand="both">
+		<nite:pointer href="gtypes.xml#gt_6" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_12" nite:start="21.87999916" nite:end="23.280000686" hand="both">
+		<nite:pointer href="gtypes.xml#gt_17" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_13" nite:start="24.719999313000002" nite:end="26.0">
+		<nite:pointer href="gtypes.xml#gt_15" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_14" nite:start="30.719999313000002" nite:end="33.560001373" hand="both">
+		<nite:pointer href="gtypes.xml#gt_15" role="TYPE"/>	</gesture>
+	<gesture nite:id="g_17" nite:start="28.319999694000003" nite:end="28.799999237" hand="left">
+		<nite:pointer href="gtypes.xml#gt_11" role="TYPE"/>
+	</gesture>
+	<gesture nite:id="g_18" nite:start="28.799999237" nite:end="30.719999313000002" hand="left">
+		<nite:pointer href="gtypes.xml#gt_12" role="TYPE"/>
+	</gesture>
+</nite:root>

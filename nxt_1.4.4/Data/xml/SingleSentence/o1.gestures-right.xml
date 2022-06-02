@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<nite:stream nite:id="gest_str_1" nite:content="set"
+    xmlns:nite="http://nite.sourceforge.net/">
+   <gest nite:id="ge_1" target="toys">
+      <nite:pointer role="TYPE" href="gtypes.xml#id('g_6')"/>
+      <phase nite:id="p_1" nite:start="0.4" nite:end="0.8" type="prep"/>
+      <phase nite:id="p_2" nite:start="0.8" nite:end="1.2" type="stroke"/>
+      <phase nite:id="p_3" nite:start="1.2" nite:end="1.9" type="hold"/>
+      <phase nite:id="p_4" nite:start="1.9" nite:end="2.2" type="retract"/>
+   </gest>
+</nite:stream>

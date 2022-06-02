@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+
+<lex nite:id="l_l" lexentry="lexicon" xmlns:nite='http://nite.sourceforge.net/'>
+	<lex nite:id='l_Hb' lexentry='Hebrew'>
+		<lex nite:id="l_prep" lexentry="preposition">
+			<lex nite:id='l_1' lexentry='B.: Pp' lemma='B.:' pos='Pp' gloss='LOC'/>
+			<lex nite:id='l_5' lexentry='")T 1 Po' lemma=')"T' pos='Po' KBL='1' gloss='ACC'/>
+		</lex>
+		<lex nite:id="l_verb" lexentry="verb">
+			<lex nite:id='l_3' lexentry='BR) 1 vq' lemma='BR)' pos='v' KBL='1' voice='q' gloss='create'/>
+		</lex>
+		<lex nite:id="l_noun" lexentry="noun">
+			<lex nite:id='l_2' lexentry='R")$IYT nc' pos='nc' lemma='R")$IYT' gloss='beginning'/>
+			<lex nite:id='l_4' lexentry='):ELOHIYM nc' pos='nc' lemma='):ELOHIYM' gloss='god'/>
+			<lex nite:id='l_7' lexentry='$FMAYIM nc' pos='nc' lemma='$FMAYIM' gloss='heaven'/>
+			<lex nite:id='l_9' lexentry=')RC nc' pos='nc' lemma=')RC' gloss='earth'/>
+		</lex>
+		<lex nite:id="l_conj" lexentry="conjunction">
+			<lex nite:id='l_8' lexentry='W: Pc' lemma='W:' pos='Pc' gloss='CR'/>
+		</lex>
+		<lex nite:id="l_dem" lexentry="demonstrative">
+			<lex nite:id='l_6' lexentry='HA Pa' lemma='HA' pos='Pa' gloss='ART'/>
+		</lex>
+	</lex>
+</lex>
+
+
+
+

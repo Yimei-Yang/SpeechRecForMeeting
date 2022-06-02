@@ -1,0 +1,64 @@
+Pnuts 1.0rc1 License Agreement
+
+SUN MICROSYSTEMS, INC. THROUGH NIHON SUN MICROSYSTEMS K.K. ("SUN") WILL 
+LICENSE THIS SOFTWARE IN BINARY AND SOURCE CODE FORM (SOFTWARE) AND THE 
+ACCOMPANYING DOCUMENTATION TO YOU ("LICENSEE") ONLY ON YOUR ACCEPTANCE OF 
+ALL THE TERMS SET FORTH BELOW. READ THE TERMS AND CONDITIONS OF THIS 
+AGREEMENT CAREFULLY BEFORE SELECTING THE "AGREE" BUTTON AT THE BOTTOM OF 
+THIS PAGE. BY SELECTING THE "AGREE" BUTTON, YOU AGREE TO BE BOUND BY THE 
+TERMS AND CONDITIONS OF THIS AGREEMENT. IF YOU ARE NOT WILLING TO BE BOUND 
+BY THIS AGREEMENT, SELECT THE "DISAGREE" BUTTON AT THE BOTTOM OF THIS PAGE 
+AND THE INSTALLATION/ DOWNLOADING PROCESS WILL NOT CONTINUE. YOUR USE OF 
+THIS SOFTWARE INDICATES YOUR ASSENT TO BE BOUND BY THE LICENSE TERMS SET 
+FORTH BELOW. 
+
+Sun grants Licensee a non-exclusive, royalty-free right to download, 
+install, compile, use, copy and distribute this Software, modify or 
+otherwise create derivative works from the Software (each, a 
+"Modification") and distribute any Modification to its customers with a 
+license agreement containing these terms. 
+
+Licensee shall, in a prominently visible way, retain a statement that the 
+Modification satisfies the specifications of Pnuts API and Pnuts Script 
+Language as of the date of its distribution as provided for at 
+http://javacenter.sun.co.jp/pnuts/ in a Modification for distribution.  Licensee 
+is prohibited from distributing a Modification which does not satisfy the 
+specifications of Pnuts API and Pnuts Script Language without prior written 
+consent by Sun.  Pnuts API means classes or interfaces whose name begin 
+with "pnuts" in Java class library included in the Software and/or the 
+Modification.  The specifications of Pnuts API and Pnuts Script Language 
+may be modified without prior notice.  Licensee agrees (i) not to introduce 
+any modifications which will be harmful to the functions of Pnuts API and 
+Pnuts Script Language, other users and their systems; and (ii) where a 
+Modification is made to parts of the source code related to Pnuts API of the Software, to 
+promptly notify Sun, at the e-mail address below, of an accurate specification in 
+source code form of the Modification, so as to enable free use by all 
+licesed users and Sun.
+
+        Notice to Sun: pnuts-admin@Japan.Sun.COM
+
+The Software is copyrighted by Sun and Licensee shall retain and reproduce 
+all copyright and other notices presently on the Software. As between Sun 
+and Licensee, Sun is the sole owner of all rights in and to the Software 
+other than the limited rights granted to Licensee herein; Licensee will own 
+its Modifications, expressly subject to Sun's continuing ownership of the 
+Software.  Licensee agrees that Sun may reproduce, modify, disseminate and 
+otherwise use the Modification as part of the Software at no cost to Sun or 
+its licensed users, and to authorize others to do so.  Sun may, at its sole 
+discretion, decide whether or not to incorporate any part of the 
+Modification into the Software.  Licensee will, at its expense, defend and 
+indemnify Sun and its licensors from and against any third party claims, 
+including costs and reasonable attorneys' fees, and be wholly responsible 
+for any liabilities arising out of or related to Licensee's development, 
+use or distribution of the Software or Modifications. 
+
+THE SOFTWARE IS BEING PROVIDED TO LICENSEE "AS IS" AND ALL EXPRESS OR 
+IMPLIED CONDITIONS AND WARRANTIES, INCLUDING ANY IMPLIED WARRANTY OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT, ARE 
+DISCLAIMED. IN NO EVENT WILL SUN BE LIABLE HEREUNDER FOR ANY DIRECT DAMAGES 
+OR ANY INDIRECT, PUNITIVE, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES OF 
+ANY KIND. 
+
+This Agreement is made under, shall be governed by and construed in 
+accordance with California law and controlling U.S. federal law, excluding 
+choice of law rules. 

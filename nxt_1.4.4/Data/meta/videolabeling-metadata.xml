@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- <!DOCTYPE corpus SYSTEM "dtd/meta-standoff.dtd"> -->
+
+<!-- NXT METADATA EXAMPLE FOR A DAGMAR CORPUS	
+     JONATHAN KILGOUR 24/3/3
+     
+     Adapted for video labeling demo:
+     Dennis Reidsma 15/02/2005
+-->
+<corpus description="Dagmar Corpus: Video Labeling Demo" id="cvl1" links="ltxml1" type="standoff">
+    <!-- GENERIC CORPUS INFORMATION -->
+    <reserved-attributes>
+        <identifier name="nite:id"/>
+        <starttime name="nite:start"/>
+        <endtime name="nite:end"/>
+        <agentname name="who"/>
+    </reserved-attributes>
+    <reserved-elements>
+        <pointername name="nite:pointer"/>
+        <child name="nite:child"/>
+        <stream name="nite:root"/>
+    </reserved-elements>
+
+    <signals path="../signals/dagmar">
+        <interaction-signals>
+            <signal extension="avi" format="avi" name="dagmar" type="video"/>
+        </interaction-signals>
+    </signals>
+
+    <!-- ONTOLOGIES -->
+    <!-- ontologies are static hierarchies e.g. the gesture ontology in this
+         example -->
+    <ontologies path="../xml/videolabeling">
+        <ontology description="posture ontology" name="ptypes" filename="ptypes" element-name="ptype" attribute-name="name"/>
+    </ontologies>
+ 
+    <!-- CODINGS -->
+    <codings path="../xml/videolabeling">
+        <interaction-codings>
+            <coding-file name="pose">
+                <time-aligned-layer name="posture-layer">
+                    <code name="posture">
+                        <pointer number="1" role="TYPE" target="ptypes"/>
+                    </code>
+                </time-aligned-layer>
+            </coding-file>
+
+        </interaction-codings>
+    </codings>
+
+    <callable-programs>
+      <callable-program name="net.sourceforge.nite.tools.videolabeler.ContinuousVideoLabeling" description="Video labelling program">
+        <required-argument name="corpus" type="corpus"/>
+        <required-argument name="observation" type="observation"/>
+        <required-argument default="../../lib/nxtConfig.xml" name="config"/>
+        <required-argument default="csl-gs-default" name="gui-settings"/>
+        <required-argument default="csl-cs-dagmar" name="corpus-settings"/>
+      </callable-program>
+    </callable-programs>
+
+    <observations>
+        <observation name="o1"/>
+    </observations>
+</corpus>

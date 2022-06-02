@@ -1,0 +1,154 @@
+#!/usr/bin/perl
+
+# Script to transform AMI transcription to reference word data in NXT
+# format
+
+# EDIT THESE FOR YOUR SETUP!
+$NXTDIR="/home/jonathan/NXT/nxt"; # Your NXT installation
+
+# these two lists should have the same number of entries and the order
+# will determine how channels in the .trs files map to agents in
+# NXT. If there's a reason you don't want a static transform (there
+# shouldn't be!) then you have to do some work here.
+@channels=("0","1","2","3");   # numbers of channels
+@agents=("A","B","C","D");     # names of NXT agents
+$wordfile="words";
+$wordelement="w";
+$segmentfile="segments";
+$segmentelement="segment";
+
+
+$XSLDIR=".";   # where to find XSL stylesheets for translation
+$PROGHOME="."; # where to find translation program files
+$JAVADIR="/usr"; # where to find java ($JAVADIR/bin/java should be used)
+
+$split = "$PROGHOME/split_words"; 
+$indir = ".";
+$outdir = ".";
+
+while (@ARGV) {
+    $arg = shift(@ARGV);
+    if ($arg eq "-o") {
+        $outdir = shift(@ARGV);
+        if (!$outdir) { &usage; }
+    } elsif ($arg eq "-c") {
+        $METADATA = shift(@ARGV);
+    } elsif ($arg eq "-n") {
+        $NXTDIR = shift(@ARGV);
+    } elsif ($arg eq "-i") {
+        $indir = shift(@ARGV);
+        if (!$indir) { &usage; }
+    } elsif ($arg eq "-ob") {
+        $obs = shift(@ARGV);
+        if (!$obs) { &usage; }
+    } elsif ($arg eq "-we") {
+        $wordelement = shift(@ARGV);
+        if (!$wordelement) { &usage; }
+    } elsif ($arg eq "-wf") {
+        $wordfile = shift(@ARGV);
+        if (!$wordfile) { &usage; }
+    } elsif ($arg eq "-se") {
+        $segmentelement = shift(@ARGV);
+        if (!$segmentelement) { &usage; }
+    } elsif ($arg eq "-sf") {
+        $segmentfile = shift(@ARGV);
+        if (!$segmentfile) { &usage; }
+    } elsif ($arg =~ /^-/) {
+        &usage;
+    } 
+}
+
+if (!$obs || !$METADATA || !$NXTDIR) {
+    &usage;
+}
+
+sub usage {
+    print STDERR "Usage: trs2nxt  -c <metadata_file> -ob <observationname> [-i in_dir] [ -o <out_dir> ] [-n nxt_dir] [-we <word_element_name>] [-wf <word_file_name>] [-se <segment_element_name>] [-sf <segment_file_name>]\n";
+    exit 1;
+}
+
+$fin = "$indir/$obs\.trs";
+if (!(-f $fin)) {
+    $ls = `ls $indir/*/$obs.trs`;
+    $mls = $ls;
+    $mls =~s/^\s*//;
+    $mls =~ s/\s+.*$//;
+    $mls =~s/\n//;
+    if (!(-f $mls)) {
+	die "File $fin does not exist (even in subdirectory). Exiting.\n";
+    }
+    $fin=$mls;
+    $indir=$mls;
+    $indir =~ s/\/[^\/]*$//;
+}
+
+#----------------------
+# Purge the doctype
+#
+# Though it looks reasonable to me, the xalan transform hangs if I
+# leave it in. Not sure why.
+#----------------------
+$out0="$outdir/$obs.transcription0.xml";
+open (IN, "$fin") || die "Can't open $fin";
+open (OUT, ">$out0") || die "Can't open $out0";
+while (<IN>) {
+    if ($_!~/\<\!DOCTYPE/) {
+	print OUT $_;
+    }
+}
+
+
+#----------------------------
+print "
+# STAGE 1 - downcase
+";
+#----------------------------
+$out1="$outdir/$obs.transcription1.xml";
+
+# Downcase all elements and attribute names
+$out3="$outdir/$obs.transcription_down.xml";
+#print "$PROGHOME/downcase < $out0 > $out3\n";
+`$PROGHOME/downcase < $out0 > $out3`;
+
+
+#----------------------------
+print "
+# STAGE 2 - Add IDs
+";
+#----------------------------
+$out4="$outdir/$obs.transcription.xml";
+#print "$JAVADIR/bin/java -classpath $NXTDIR/lib/xalan.jar org.apache.xalan.xslt.Process -in $out3 -xsl $XSLDIR/add-ids.xsl -out $out4 -param session $obs\n";
+`$JAVADIR/bin/java -classpath $NXTDIR/lib/xalan.jar org.apache.xalan.xslt.Process -in $out3 -xsl $XSLDIR/add-ids.xsl -out $out4 -param session $obs`;
+
+
+#-------------------------------
+print "
+# STAGE 3 - Separate Agent files
+";
+#-------------------------------
+
+
+# note that the channel is stored as an attribute just in case.
+
+for ($i=0; $i<scalar(@channels); $i++) {
+    #print "$JAVADIR/bin/java -classpath $NXTDIR/lib/xalan.jar org.apache.xalan.xslt.Process -in $out4 -xsl $XSLDIR/split-user.xsl -out $outdir/$obs.$agents[$i].segs.xml -param session $obs -param participant $channels[$i]\n";
+    `$JAVADIR/bin/java -classpath $NXTDIR/lib/xalan.jar org.apache.xalan.xslt.Process -in $out4 -xsl $XSLDIR/split-user.xsl -out $outdir/$obs.$agents[$i].segs.xml -param session $obs -param participant $channels[$i]`;
+
+    print "$split -i $outdir -o $outdir -a $agents[$i] -ob $obs -we $wordelement -wf $wordfile -se $segmentelement -sf $segmentfile\n";
+    `$split -i $outdir -o $outdir -a $agents[$i] -ob $obs -we $wordelement -wf $wordfile -se $segmentelement -sf $segmentfile`;
+}
+
+#`/bin/rm $outdir/$obs.transcription*.xml`;
+#`/bin/rm $outdir/$obs.*.segs.xml`;
+
+#-------------------------------
+print "
+# STAGE 4 - Add observation to metadata & check validity
+";
+#-------------------------------
+$ao="AddObservation.class";
+if (!-f "./$ao" && !-f "$NXTDIR/lib/$ao" && !-f "$PROGHOME/$ao") {
+    die "Final stage of transform not completed - please compile AddObservation.java and put it somewhere in one of these directories:  '.', '$NXTDIR/lib', '$PROGHOME'\n";
+}
+print "$JAVADIR/bin/java -classpath .:$NXTDIR/lib:$NXTDIR/lib/nxt.jar:$NXTDIR/lib/xalan.jar:$NXTDIR/lib/xml-apis.jar:$NXTDIR/xercesImpl.jar:$PROGHOME AddObservation $METADATA $obs\n";
+`$JAVADIR/bin/java -classpath .:$NXTDIR/lib:$NXTDIR/lib/nxt.jar:$NXTDIR/lib/xalan.jar:$NXTDIR/lib/xml-apis.jar:$NXTDIR/xercesImpl.jar:$PROGHOME AddObservation $METADATA $obs`;

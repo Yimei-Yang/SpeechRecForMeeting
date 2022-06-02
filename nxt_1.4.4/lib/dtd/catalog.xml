@@ -1,0 +1,6 @@
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+ <public publicId="-//W3C//DTD META-STANDOFF 20030503//EN"
+         uri="meta-standoff.dtd"/>
+ <public publicId="-//W3C//DTD META-SIMPLE 20030503//EN"
+         uri="meta-simple.dtd"/>
+</catalog>

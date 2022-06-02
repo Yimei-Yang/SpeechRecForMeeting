@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- <!DOCTYPE corpus SYSTEM "dtd/meta-standoff.dtd"> -->
+<!-- NXT METADATA EXAMPLE FOR A DAGMAR CORPUS	
+     JONATHAN KILGOUR 24/3/3
+-->
+<corpus description="Dagmar Corpus" id="dagmar1" links="ltxml1" type="standoff">
+    <!-- GENERIC CORPUS INFORMATION -->
+    <reserved-attributes>
+        <identifier name="nite:id"/>
+        <starttime name="nite:start"/>
+        <endtime name="nite:end"/>
+        <agentname name="who"/>
+    </reserved-attributes>
+    <reserved-elements>
+        <pointername name="nite:pointer"/>
+        <child name="nite:child"/>
+        <stream name="nite:root"/>
+    </reserved-elements>
+    <signals path="../signals/dagmar">
+        <interaction-signals>
+            <signal extension="avi" format="avi" name="dagmar" type="video"/>
+        </interaction-signals>
+    </signals>
+    <!-- ONTOLOGIES -->
+    <!-- ontologies are static hierarchies e.g. the gesture ontology in this
+         example -->
+    <ontologies path="../xml/dagmar">
+        <ontology attribute-name="name" description="gesture ontology"
+            element-name="gtype" filename="gtypes" name="gtypes"/>
+        <ontology description="posture ontology" name="ptypes" filename="ptypes" element-name="ptype" attribute-name="name"/>
+    </ontologies>
+
+    <!-- CODINGS -->
+    <codings path="../xml/dagmar">
+        <interaction-codings>
+            <coding-file name="pose">
+                <time-aligned-layer name="posture-layer">
+                    <code name="posture">
+                        <pointer number="1" role="TYPE" target="ptypes"/>
+                    </code>
+                </time-aligned-layer>
+            </coding-file>
+
+            <coding-file name="gestures">
+                <time-aligned-layer name="gesture-layer">
+                    <code name="gesture">
+                        <attribute name="hand" value-type="string"/>
+                        <pointer number="1" role="TYPE" target="gtypes"/>
+                    </code>
+                </time-aligned-layer>
+            </coding-file>
+            <coding-file name="syntax">
+                <structural-layer name="syntax-layer" recursive-draws-children-from="words-layer">
+                    <code name="syntax">
+                        <attribute name="cat" value-type="string">
+                            <value>S</value>
+                            <value>NP</value>
+                            <value>PP</value>
+                            <value>VP</value>
+                        </attribute>
+                        <attribute name="hlem" value-type="string"/>
+                    </code>
+                </structural-layer>
+            </coding-file>
+            <coding-file name="text">
+                <time-aligned-layer name="words-layer">
+                    <code name="word">
+                        <attribute name="orth" value-type="string"/>
+                        <attribute name="pos" value-type="enumerated">
+                            <value>ADJA</value>
+                            <!-- attributives Adjektiv -->
+                            <value>ADJD</value>
+                            <!-- adverbiales oder pr?katives Adjektiv -->
+                            <value>ADV</value>
+                            <!-- Adverb -->
+                            <value>APPR</value>
+                            <!-- Pr?sition; Zirkumposition links -->
+                            <value>APPRART</value>
+                            <!-- Pr?sition mit Artikel -->
+                            <value>APPO</value>
+                            <!-- Postposition -->
+                            <value>APZR</value>
+                            <!-- Zirkumposition rechts -->
+                            <value>ART</value>
+                            <!-- bestimmter oder unbestimmter Artikel -->
+                            <value>CARD</value>
+                            <!-- Kardinalzahl -->
+                            <value>FM</value>
+                            <!-- Fremdsprachliches Material -->
+                            <value>ITJ</value>
+                            <!-- Interjektion -->
+                            <value>KOUI</value>
+                            <!-- unterordnende Konjunktion mit ``zu'' und Infinitiv -->
+                            <value>KOUS</value>
+                            <!-- unterordnende Konjunktion mit Satz -->
+                            <value>KON</value>
+                            <!-- nebenordnende Konjunktion -->
+                            <value>KOKOM</value>
+                            <!-- Vergleichskonjunktion -->
+                            <value>NN</value>
+                            <!-- normales Nomen -->
+                            <value>NE</value>
+                            <!-- Eigennamen -->
+                            <value>PDS</value>
+                            <!-- substituierendes Demonstrativpronomen -->
+                            <value>PDAT</value>
+                            <!-- attribuierendes Demonstrativpronomen -->
+                            <value>PIS</value>
+                            <!-- substituierendes Indefinitpronomen -->
+                            <value>PIAT</value>
+                            <!-- attribuierendes Indefinitpronomen ohne Determiner -->
+                            <value>PIDAT</value>
+                            <!-- attribuierendes Indefinitpronomen mit Determiner -->
+                            <value>PPER</value>
+                            <!-- irreflexives Personalpronomen -->
+                            <value>PPOSS</value>
+                            <!-- substituierendes Possessivpronomen -->
+                            <value>PPOSAT</value>
+                            <!-- attribuierendes Possessivpronomen -->
+                            <value>PRELS</value>
+                            <!-- substituierendes Relativpronomen -->
+                            <value>PRELAT</value>
+                            <!-- attribuierendes Relativpronomen -->
+                            <value>PRF</value>
+                            <!-- reflexives Personalpronomen -->
+                            <value>PWS</value>
+                            <!-- substituierendes Interrogativpronomen -->
+                            <value>PWAT</value>
+                            <!-- attribuierendes Interrogativpronomen -->
+                            <value>PWAV</value>
+                            <!-- adverbiales Interrogativ- oder Relativpronomen -->
+                            <value>PAV</value>
+                            <!-- Pronominaladverb -->
+                            <value>PTKZU</value>
+                            <!-- ``zu'' vor Infinitiv -->
+                            <value>PTKNEG</value>
+                            <!-- Negationspartikel -->
+                            <value>PTKVZ</value>
+                            <!-- abgetrennter Verbzusatz -->
+                            <value>PTKANT</value>
+                            <!-- Antwortpartikel -->
+                            <value>PTKA</value>
+                            <!-- Partikel bei Adjektiv oder Adverb -->
+                            <value>TRUNC</value>
+                            <!-- Kompositions-Erstglied -->
+                            <value>VVFIN</value>
+                            <!-- finites Verb, voll -->
+                            <value>VVIMP</value>
+                            <!-- Imperativ, voll -->
+                            <value>VVINF</value>
+                            <!-- Infinitiv, voll -->
+                            <value>VVIZU</value>
+                            <!-- Infinitiv mit ``zu'', voll -->
+                            <value>VVPP</value>
+                            <!-- Partizip Perfekt, voll -->
+                            <value>VAFIN</value>
+                            <!-- finites Verb, aux -->
+                            <value>VAIMP</value>
+                            <!-- Imperativ, aux -->
+                            <value>VAINF</value>
+                            <!-- Infinitiv, aux -->
+                            <value>VAPP</value>
+                            <!-- Partizip Perfekt, aux -->
+                            <value>VMFIN</value>
+                            <!-- finites Verb, modal -->
+                            <value>VMINF</value>
+                            <!-- Infinitiv, modal -->
+                            <value>VMPP</value>
+                            <!-- Partizip Perfekt, modal -->
+                            <value>XY</value>
+                            <!-- Nichtwort, Sonderzeichen enthaltend -->
+                            <value>\$,</value>
+                            <!-- Komma -->
+                            <value>\$.</value>
+                            <!-- Satzbeendende Interpunktion -->
+                            <value>\$(</value>
+                            <!-- sonstige Satzzeichen; satzintern  -->
+                        </attribute>
+                    </code>
+                </time-aligned-layer>
+            </coding-file>
+        </interaction-codings>
+    </codings>
+    <callable-programs>
+        <callable-program description="data display" name="DagmarGestures">
+            <required-argument name="" type="corpus"/>
+            <required-argument name="" type="observation"/>
+        </callable-program>
+        <callable-program description="Video Labeller" name="net.sourceforge.nite.tools.videolabeler.ContinuousVideoLabeling">
+            <required-argument name="corpus" type="corpus"/>
+            <required-argument name="observation" type="observation"/>
+            <required-argument default="../../lib/nxtConfig.xml" name="config"/>
+            <required-argument default="dac-gs-default" name="gui-settings"/>
+            <required-argument default="csl-cs-dagmar" name="corpus-settings"/>
+        </callable-program>
+    </callable-programs>
+    <observations>
+        <observation name="o1"/>
+    </observations>
+</corpus>
