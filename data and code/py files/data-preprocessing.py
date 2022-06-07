@@ -64,6 +64,3 @@ def extract_features(output, np_list):
       #save all np.arrays(.wav) files into an array -> X dataset
       np_list.append(melspect)
 
-
-# Hey Yimei! it's Viv!
-# This time I'm not going to mess it up.
