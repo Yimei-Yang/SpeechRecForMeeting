@@ -35,7 +35,6 @@ def getInputSegmentTimes(list_of_timestamps, audio_file, segment_length, overlap
 
     return df_timestamps
 
-
 def getInputSegments(audio_file, df_timestamps):
     '''
     input: path to audio_file, df_timestamps['meeting_id','st_time','ed_time']
@@ -59,7 +58,6 @@ def getInputSegments(audio_file, df_timestamps):
 
     return segments
 
-
 def getFeatures(output, np_list):
   '''
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
@@ -74,7 +72,9 @@ def getFeatures(output, np_list):
       np_list.append(melspect)
 
 def dialogueActsXMLtoPd(pathToDialogueActs):
-  """ main """
+  '''
+  If using google drive, the path is "/content/drive/My Drive/Team 6/xml-audio/*.xml"
+  '''
   filenames = glob.glob(pathToDialogueActs)
   filename = [] 
   li = []
