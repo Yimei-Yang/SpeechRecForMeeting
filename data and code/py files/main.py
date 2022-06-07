@@ -1,7 +1,7 @@
-#import functions from data processing
-from data_preprocessing import *
 
+from data_preprocessing import *
 import glob, os
+
 #preprocessing the data
 
 try:
