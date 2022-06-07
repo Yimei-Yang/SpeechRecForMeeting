@@ -1,6 +1,7 @@
 from pydub import AudioSegment
 import wave
 import contextlib
+import numpy as np
 import pandas as pd
 import re
 
@@ -54,7 +55,7 @@ def getInputSegments(audio_file, df_timestamps):
     return segments
 
 #list of np_array(2d matrix)
-def extract_features(output, np_list):
+def getFeatures(output, np_list):
   for segment in output:
     signal,sr = librosa.load(segment,sr=None)
     if signal is None or len(signal) == 0:
@@ -64,4 +65,16 @@ def extract_features(output, np_list):
       #save all np.arrays(.wav) files into an array -> X dataset
       np_list.append(melspect)
 
-# Test
+def getLabels(segments, interruptions):
+    counts = np.empty(segments.shape[0])
+
+    for seg_index, seg_row in segments.iterrows():
+      for inter_index, inter_row in interruptions.iterrows():
+        if seg_row['st_time'] < inter_row['st_time'] and seg_row['ed_time'] > inter_row['ed_time']:
+          counts[seg_index] += 1
+        else:
+          counts[seg_index] = 0
+
+    # label as True if there's at least one entire interruption in the segment
+    labels = counts > 0 
+    return labels
