@@ -1,0 +1,51 @@
+<!-- Jonathan Kilgour 20/1/05
+  Build specification file format (initially data only)
+  for files to be used with 
+    java net.sourceforge.nite.util.Build <<buildfile.xml>>
+-->
+
+<!-- root element. -->
+<!ELEMENT build (default-annotator?, coding-file*, observation*)>
+<!-- metadata - full path to metadata
+     name - name of output zip file (without extension
+     description - description of this build
+     datatype - gold means take only 'gold-standard' files, or where
+      annotators' files are explicitly requested, move these to the
+      traditional 'gold-standard location. If there are no
+      gold-standard files, and a specific coder has not been
+      requested, no files are included. 'multi-coder' means include
+      'gold-standard' and all annotator directories unless a
+      particular annotator's files are requested, which means we don't
+      include the other annotators' files. No annotator-specific files
+      are moved to be gold-standard here. 
+-->
+<!ATTLIST build 
+        metadata CDATA #REQUIRED
+        name CDATA #REQUIRED
+        description CDATA #IMPLIED
+        type (gold|multi-coder) 'multi-coder'>
+
+<!-- where no annotator is listed for a coding, this annotator is the
+ default -->
+<!ELEMENT default-annotator EMPTY>
+<!ATTLIST default-annotator 
+        name CDATA #REQUIRED>
+
+<!-- declare a file type to be included in the build. If the
+'annotator' attribute is present, that is the chosen annotator for
+this coding [ i.e. if we are in 'gold' mode, move this annotator's
+data to be 'gold-standard'; otherwise only include this annotator's
+subdirectory.] -->
+<!ELEMENT coding-file EMPTY>
+<!ATTLIST coding-file 
+        name CDATA #REQUIRED
+        annotator CDATA #IMPLIED>
+
+<!-- an observation to be included in the build. The reserved word
+'all' means include all files, Regular expressions will be passed
+through to ant untouched. -->
+<!ELEMENT observation EMPTY>
+<!ATTLIST observation 
+        name CDATA #REQUIRED>
+
+

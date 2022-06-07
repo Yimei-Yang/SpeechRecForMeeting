@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+
+<!-- v1.0 -->
+
+<nite:stream nite:id='w_str_1' xmlns:nite='http://nite.sourceforge.net/'>
+	<w nite:id='w_1' nite:s='0' nite:e='1' phonetic='bă' pos='Pp' lemma='B.:' lang='Hb'>
+		<nite:pointer role="TYPE" href="lexicon.xml#id('l_1')"/>
+	</w>
+	<w nite:id='w_2' nite:s='1' nite:e='2' phonetic='reːʃíːθ' pos='nc' lemma='R")$IYT' lang='Hb'>
+		<nite:pointer role="TYPE" href="lexicon.xml#id('l_2')"/>
+	</w>
+	<w nite:id='w_3' nite:s='2' nite:e='3' phonetic='bɔːrɔ̀ː' pos='v' lemma='BR)' lang='Hb' KBL='1' voice='q'>
+		<nite:pointer role="TYPE" href="lexicon.xml#id('l_3')"/>
+	</w>
+	<w nite:id='w_4' nite:s='3' nite:e='4' phonetic='ʔɛ̆loːhíːm' pos='nc' lemma='):ELOHIYM' lang='Hb'>
+		<nite:pointer role="TYPE" href="lexicon.xml#id('l_4')"/>
+	</w>
+	<w nite:id='w_5' nite:s='4' nite:e='5' phonetic='ʔèːθ' pos='Po' lemma=')"T' lang='Hb' KBL='1'>
+		<nite:pointer role="TYPE" href="lexicon.xml#id('l_5')"/>
+	</w>
+	<w nite:id='w_6' nite:s='5' nite:e='6' phonetic='haʃ' pos='Pa' lemma='HA' lang='Hb'>
+		<nite:pointer role="TYPE" href="lexicon.xml#id('l_6')"/>
+	</w>
+	<w nite:id='w_7' nite:s='6' nite:e='7' phonetic='ʃɔːmáːjim' pos='nc' lemma='$FMAYIM' lang='Hb'>
+		<nite:pointer role="TYPE" href="lexicon.xml#id('l_7')"/>
+	</w>
+	<w nite:id='w_8' nite:s='7' nite:e='8' phonetic='vĕ' pos='Pc' lemma='W:' lang='Hb'>
+		<nite:pointer role="TYPE" href="lexicon.xml#id('l_8')"/>
+	</w>
+	<w nite:id='w_9' nite:s='8' nite:e='9' phonetic='ʔèːθ' pos='Po' lemma=')"T' lang='Hb' KBL='1'>
+		<nite:pointer role="TYPE" href="lexicon.xml#id('l_5')"/>
+	</w>
+	<w nite:id='w_10'  nite:s='9' nite:e='10' phonetic='hɔː' pos='Pa' lemma='HA' lang='Hb'>
+		<nite:pointer role="TYPE" href="lexicon.xml#id('l_6')"/>
+	</w>
+	<w nite:id='w_11'  nite:s='10' nite:e='11' phonetic='ʔɔ́ːrɛʦˁ' pos='nc' lemma=')EREC' lang='Hb'>
+		<nite:pointer role="TYPE" href="lexicon.xml#id('l_9')"/>
+	</w>
+</nite:stream>
+
+
+

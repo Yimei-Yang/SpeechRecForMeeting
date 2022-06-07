@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<nite:stream nite:id="word_str_1" xmlns:nite="http://nite.sourceforge.net/">
+   <word nite:id="w_1" nite:start="0.0" nite:end="0.2" orth="the" pos="DT"/>
+   <word nite:id="w_2" nite:start="0.2" nite:end="0.7" orth="man" pos="NN"/>
+   <word nite:id="w_3" nite:start="0.7" nite:end="0.9" orth="bought" pos="VBD"/>
+   <word nite:id="w_4" nite:start="1.0" nite:end="1.4" orth="these" pos="CD"/>
+   <word nite:id="w_5" nite:start="1.4" nite:end="1.7" orth="toys" pos="NNS"/>
+   <word nite:id="w_6" nite:start="1.9" nite:end="2.1" orth="for" pos="IN"/>
+   <word nite:id="w_7" nite:start="2.1" nite:end="2.3" orth="his" pos="PP$">
+      <nite:pointer role="ANTECEDENT" href="o1.syntax.xml#id('np_1')"/>
+   </word>
+   <word nite:id="w_8" nite:start="2.3" nite:end="3.0" orth="children" pos="NNS"/>
+</nite:stream>

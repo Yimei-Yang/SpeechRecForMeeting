@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- <!DOCTYPE corpus SYSTEM "meta-standoff.dtd"> -->
+
+<!-- NXT METADATA EXAMPLE FOR A STANDOFF CORPUS	
+     JEAN CARLETTA AND JONATHAN KILGOUR
+
+     ADAPTED FOR STEFAN EVERT'S EXAMPLE CORPUS
+     3/9/2
+-->
+<corpus description="Test Corpus" id="single-sentence" links="ltxml1" type="standoff">
+    <!-- GENERIC CORPUS INFORMATION -->
+    <reserved-attributes>
+        <identifier name="nite:id"/>
+        <starttime name="nite:start"/>
+        <endtime name="nite:end"/>
+        <agentname name="who"/>
+    </reserved-attributes>
+    <reserved-elements>
+        <pointername name="nite:pointer"/>
+        <child name="nite:child"/>
+        <stream name="nite:stream"/>
+    </reserved-elements>
+    <observation-variables>
+        <observation-variable name="eye-contact" type="enumerated">
+            <value>no eye</value>
+            <value>eye</value>
+        </observation-variable>
+        <observation-variable name="familiarity" type="enumerated">
+            <value>familiar</value>
+            <value>non-familiar</value>
+        </observation-variable>
+    </observation-variables>
+
+
+    <!-- ONTOLOGIES -->
+    <!-- ontologies are static hierarchies e.g. the gesture ontology in this
+         example -->
+    <ontologies path="../xml/SingleSentence">
+        <ontology description="gesture ontology" name="gtypes" filename="" element-name="gtype" attribute-name="type"/>
+    </ontologies>
+
+    <!-- CODINGS -->
+    <codings path="../xml/SingleSentence">
+        <interaction-codings>
+            <coding-file name="gestures-right">
+                <structural-layer name="gesture-layer" draws-children-from="phase-layer">
+                    <code name="gest">
+                        <attribute name="target" value-type="string"/>
+                        <pointer number="1" role="TYPE" target="gtypes"/>
+                    </code>
+                </structural-layer>
+                <time-aligned-layer name="phase-layer">
+                    <code name="phase">
+                        <attribute name="type" value-type="string"/>
+                    </code>
+                </time-aligned-layer>
+            </coding-file>
+            <coding-file name="gestures-left">
+                <structural-layer name="gesture-left-layer" draws-children-from="phase-left-layer">
+                    <code name="lgest">
+                        <attribute name="target" value-type="string"/>
+                        <pointer number="1" role="TYPE" target="gtypes"/>
+                    </code>
+                </structural-layer>
+                <time-aligned-layer name="phase-left-layer">
+                    <code name="lphase">
+                        <attribute name="type" value-type="string"/>
+                    </code>
+                </time-aligned-layer>
+            </coding-file>
+            <coding-file name="prosody">
+                <structural-layer name="prosody-layer" draws-children-from="words-layer">
+                    <code name="accent">
+                        <attribute name="tobi" value-type="string"/>
+                    </code>
+                </structural-layer>
+            </coding-file>
+
+	  <coding-file name="turns">
+		<structural-layer name="turn-layer" draws-children-from="syntax-layer">
+		  <code name="turn"/>
+		</structural-layer>
+	  </coding-file>
+
+            <coding-file name="syntax">
+                <structural-layer name="syntax-layer" draws-children-from="phrase-layer">
+                    <code name="s"/>
+                </structural-layer>
+                <structural-layer name="phrase-layer" recursive-draws-children-from="words-layer">
+                    <code name="vp">
+                        <attribute name="hlem" value-type="string"/>
+                    </code>
+                    <code name="np">
+                        <attribute name="hlem" value-type="string"/>
+                    </code>
+                    <code name="pp">
+                        <attribute name="hlem" value-type="string"/>
+                        <attribute name="prep" value-type="string"/>
+                    </code>
+                </structural-layer>
+            </coding-file>
+            <coding-file name="words">
+                <time-aligned-layer name="words-layer">
+                    <code name="word">
+                        <attribute name="orth" value-type="string"/>
+                        <attribute name="pos" value-type="enumerated">
+                            <value>CC</value>
+                            <value>CD</value>
+                            <value>DT</value>
+                            <value>EX</value>
+                            <value>FW</value>
+                            <value>IN</value>
+                            <value>JJ</value>
+                            <value>JJR</value>
+                            <value>JJS</value>
+                            <value>LS</value>
+                            <value>MD</value>
+                            <value>NN</value>
+                            <value>NNS</value>
+                            <value>NNP</value>
+                            <value>NNPS</value>
+                            <value>PDT</value>
+                            <value>POS</value>
+                            <value>PRP</value>
+                            <value>PRP$</value>
+                            <value>RB</value>
+                            <value>RBR</value>
+                            <value>RBS</value>
+                            <value>RP</value>
+                            <value>TO</value>
+                            <value>UH</value>
+                            <value>VB</value>
+                            <value>VBD</value>
+                            <value>VBG</value>
+                            <value>VBN</value>
+                            <value>VBP</value>
+                            <value>VBZ</value>
+                            <value>WDT</value>
+                            <value>WP</value>
+                            <value>WP$</value>
+                            <value>WRB</value>
+                        </attribute>
+                        <pointer number="1" role="ANTECEDENT" target="phrase-layer"/>
+                    </code>
+                </time-aligned-layer>
+            </coding-file>
+        </interaction-codings>
+    </codings>
+
+    <callable-programs>
+      <callable-program name="SimpleSaveExample" description="load and save example">
+        <required-argument name="corpus" type="corpus"/>
+      </callable-program>
+    </callable-programs>
+
+    <observations>
+        <observation name="o1"/>
+    </observations>
+</corpus>

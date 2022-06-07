@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!-- v1.0 -->
+
+<nite:stream nite:id='WTS_str_1' xmlns:nite='http://nite.sourceforge.net/'>
+	<WTS nite:id='WTS_1' rawWTS='gn1:1,1.1 B.: B.:@Pp' wordWTS='1'>
+		<nite:child href="Gen.wordpart.xml#id('w_1')"/>
+	</WTS>
+	<WTS nite:id='WTS_2' rawWTS='gn1:1,1.2 R")$I73YT R")$IYT@ncfsa' wordWTS='1'>
+		<nite:child href="Gen.wordpart.xml#id('w_2')"/>
+	</WTS>
+	<WTS nite:id='WTS_3' rawWTS='gn1:1,2.1 B.FRF74) BR)_1@vqp3ms' wordWTS='2'>
+		<nite:child href="Gen.wordpart.xml#id('w_3')"/>
+	</WTS>
+	<WTS nite:id='WTS_4' rawWTS='gn1:1,3.1 ):ELOHI92YM ):ELOHIYM@ncmpa' wordWTS='3'>
+		<nite:child href="Gen.wordpart.xml#id('w_4')"/>
+	</WTS>
+	<WTS nite:id='WTS_5' rawWTS='gn1:1,4.1 )"71T )"T_1@Po' wordWTS='4'>
+		<nite:child href="Gen.wordpart.xml#id('w_5')"/>
+	</WTS>
+	<WTS nite:id='WTS_6' rawWTS='gn1:1,5.1 HA HA@Pa' wordWTS='5'>
+		<nite:child href="Gen.wordpart.xml#id('w_6')"/>
+	</WTS>
+	<WTS nite:id='WTS_7' rawWTS='gn1:1,5.2 $.FMA73YIM $FMAYIM@ncmpa' wordWTS='5'>
+		<nite:child href="Gen.wordpart.xml#id('w_7')"/>
+	</WTS>
+	<WTS nite:id='WTS_8' rawWTS='gn1:1,6.1 W: W:@Pc' wordWTS='6'>
+		<nite:child href="Gen.wordpart.xml#id('w_8')"/>
+	</WTS>
+	<WTS nite:id='WTS_9' rawWTS='gn1:1,6.2 )"71T )"T_1@Po' wordWTS='6'>
+		<nite:child href="Gen.wordpart.xml#id('w_9')"/>
+	</WTS>
+	<WTS nite:id='WTS_10' rawWTS='gn1:1,7.1 HF HA@Pa' wordWTS='7'>
+		<nite:child href="Gen.wordpart.xml#id('w_10')"/>
+	</WTS>
+	<WTS nite:id='WTS_11' rawWTS='gn1:1,7.2 )F75REC00 )EREC@ncfsa' wordWTS='7'>
+		<nite:child href="Gen.wordpart.xml#id('w_11')"/>
+	</WTS>
+</nite:stream>

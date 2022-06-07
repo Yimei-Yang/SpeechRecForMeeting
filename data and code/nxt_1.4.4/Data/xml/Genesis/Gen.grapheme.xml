@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- v1.0 -->
+
+<nite:stream nite:id="grapheme_str_1" xmlns:nite="http://nite.sourceforge.net/">
+	<grapheme nite:id='g_1' grapheme-number='1'>
+		<nite:child href="Gen.wordpart.xml#id('w_1')..id('w_2')"/>
+	</grapheme>
+	<grapheme nite:id='g_2' grapheme-number='2'>
+		<nite:child href="Gen.wordpart.xml#id('w_3')..id('w_3')"/>
+	</grapheme>
+	<grapheme nite:id='g_3' grapheme-number='3'>	
+		<nite:child href="Gen.wordpart.xml#id('w_4')..id('w_4')"/>
+	</grapheme>
+	<grapheme nite:id='g_4' grapheme-number='4'>
+		<nite:child href="Gen.wordpart.xml#id('w_5')..id('w_5')"/>
+	</grapheme>
+	<grapheme nite:id='g_5' grapheme-number='5'>
+		<nite:child href="Gen.wordpart.xml#id('w_6')..id('w_7')"/>
+	</grapheme>
+	<grapheme nite:id='g_6' grapheme-number='6'>
+		<nite:child href="Gen.wordpart.xml#id('w_8')..id('w_9')"/>
+	</grapheme>
+	<grapheme nite:id='g_7' grapheme-number='7'>
+		<nite:child href="Gen.wordpart.xml#id('w_10')..id('w_11')"/>
+	</grapheme>
+</nite:stream>

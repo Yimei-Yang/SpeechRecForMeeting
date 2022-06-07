@@ -1,0 +1,289 @@
+
+<!-- a base for DTDs describing metadata for NITE corpora -->
+<!-- cannot be used standalone as "codings" is not defined! -->
+<!-- see meta-simple.dtd and meta-standoff.dtd for useable validators -->
+<!-- Jonathan Kilgour 10/1/3 -->
+
+<!-- The top level element 'corpus' contains at least some coding
+ descriptions, and may also contain a description of:
+  the observations made, the agents involved, the data signals
+  collected, the editors and displays available etc. -->
+<!ELEMENT corpus (reserved-attributes?, reserved-elements?, cvsinfo?, documents?,
+                  observation-variables?, agents?, signals?, 
+                  corpus-resources?, ontologies?, object-sets?, codings, 
+		  styles?,  views?, callable-programs?, observations?)>
+
+<!-- The 'type' attribute of the corpus defines whether it's a single
+ hierarchy or a standoff corpus of multiple intersecting hierarchies,
+ stored according to the NITE corpus filenaming conventions. The
+ 'links' attribute value is only relevant for standoff corpora and
+ specifies the syntax of links used in pointers and children. -->
+<!ATTLIST corpus 
+        id ID #REQUIRED
+	type (simple|standoff) 'simple'
+	links (ltxml1|xpointer) 'ltxml1'
+	description CDATA #IMPLIED>
+
+
+<!-- Attribute and content models used below. -->
+<!ENTITY % attr.name "
+        name CDATA #REQUIRED
+">
+<!ENTITY % attr.nameID "
+        name ID #REQUIRED
+">
+<!ENTITY % attr.var-type "
+        type (string|number|enumerated) 'string'
+">
+<!ENTITY % attr.description "
+        description CDATA #IMPLIED
+">
+<!ENTITY % attr.path "
+        path CDATA #REQUIRED
+">
+<!ENTITY % attr.filename "
+        filename CDATA #REQUIRED
+">
+<!ENTITY % attr.sound "
+        sound (yes|no) 'yes'
+">
+
+
+<!-- RESERVED ATTRIBUTES - These define the attribute names used
+ corpus-wide to represent identifiers, start and end times, and the
+ identities of agents. Defaults are 'nite:id', 'nite:start',
+ 'nite:end' and 'nite:agent' respectively -->
+<!ELEMENT reserved-attributes (identifier?, starttime?, endtime?, agentname?, observationname?, commentname?, keystroke?)>
+<!ELEMENT identifier EMPTY>
+<!ATTLIST identifier %attr.name;>
+<!ELEMENT starttime EMPTY>
+<!ATTLIST starttime %attr.name;>
+<!ELEMENT endtime EMPTY>
+<!ATTLIST endtime %attr.name;>
+<!ELEMENT agentname EMPTY>
+<!ATTLIST agentname %attr.name;>
+<!ELEMENT observationname EMPTY>
+<!ATTLIST observationname %attr.name;>
+<!ELEMENT commentname EMPTY>
+<!ATTLIST commentname %attr.name;>
+<!ELEMENT keystroke EMPTY>
+<!ATTLIST keystroke %attr.name;>
+
+
+<!-- RESERVED ELEMENTS - These define the element names used
+ corpus-wide to represent pointers, children and stream elements.
+ Defaults are 'nite:pointer', 'nite:child', and 'nite:stream'
+ respectively -->
+<!ELEMENT reserved-elements (pointername?, child?, stream?)>
+<!ELEMENT pointername EMPTY>
+<!ATTLIST pointername %attr.name;>
+<!ELEMENT child EMPTY>
+<!ATTLIST child %attr.name;>
+<!ELEMENT stream EMPTY>
+<!ATTLIST stream %attr.name;>
+
+<!-- CVS INFORMATION - where CVS is used to retirieve and commit data
+in a corpus this contains the relevant information -->
+<!ELEMENT cvsinfo EMPTY>
+<!ATTLIST cvsinfo
+   protocol (pserver|ext|local|sspi) 'pserver'
+   server CDATA #REQUIRED
+   module CDATA #REQUIRED
+ >
+
+<!-- OBSERVATION VARIABLES - the 'variable's declared here must appear
+ for each observaion listed at the end of the file. This is like a
+ user-definable 'ATTLIST' for the 'observation' element.  -->
+<!ELEMENT observation-variables (observation-variable*)>
+<!ELEMENT observation-variable (value*)>
+<!ATTLIST observation-variable %attr.name; %attr.var-type;>
+<!ELEMENT value (#PCDATA)>
+
+
+<!-- DOCUMENTS - define the number and identifier of participants in each
+ interaction. If no documents are present, the corpus is assumed to be
+ monological -->
+<!ELEMENT documents (document*)>
+<!ELEMENT document EMPTY>
+<!ATTLIST document  %attr.nameID; %attr.description;
+   authors CDATA #IMPLIED
+   url CDATA #IMPLIED
+   citation CDATA #IMPLIED
+ >
+
+<!-- AGENTS - define the number and identifier of participants in each
+ interaction. If no agents are present, the corpus is assumed to be
+ monological -->
+<!ELEMENT agents (agent*)>
+<!ELEMENT agent EMPTY>
+<!ATTLIST agent %attr.nameID; %attr.description;>
+
+
+<!-- SIGNALS - describing the types and formats of the data signals
+ (audio / video / heartrate etc.) that have been collected for this
+ corpus. Interaction signals contain data for all the participants,
+ whereas agent signals have been recorded one-per-agent.  -->
+<!ELEMENT signals (agent-signals*, interaction-signals*)>
+<!ATTLIST signals %attr.path;>
+<!ELEMENT agent-signals (signal+)>
+<!ELEMENT interaction-signals (signal+)>
+<!ELEMENT signal EMPTY>
+<!ATTLIST signal %attr.nameID;
+        format CDATA #IMPLIED
+	extension CDATA #REQUIRED
+	type (audio|video) #REQUIRED>
+
+
+<!-- CORPUS RESPORCES - are resource files that are not as strictly
+ specified as ontologies or object sets (below). They will probably
+ eventually replace the use of those things. Typically these will be
+ files that come from the original application and can be used almost
+ without alteration. You may specify the exact hierarchical breakdown
+ of such a file, but typically there will just be one recursive layer
+ (pointing to itself) that specifies all the codes permissible -->
+<!ELEMENT corpus-resources (corpus-resource-file*)>
+<!ATTLIST corpus-resources %attr.path;>
+<!ELEMENT corpus-resource-file (time-aligned-layer|structural-layer|featural-layer)*>
+<!ATTLIST corpus-resource-file %attr.nameID; %attr.description;>
+
+<!-- ONTOLOGIES - ontologies are static type hierarchies e.g. the
+  gesture ontology. Note that we restrict these hierarchies quite
+  severely: the hierarchy can always be recursive, but there can only
+  be one element name in the hierarchy (defined by 'element-name').
+  We have just relaxed the restriction that there is only one
+  attribute per type element: the defining attribute on each element
+  (defined by 'attribute-name') holds the subtype name, but any number
+  of other permitted attributes can be declared as children of the
+  'ontology'. The 'name' attribute is the identifier by which this
+  ontology can be pointed into and the 'filename' attribute defines
+  where it can be found on disk (in combination with the 'path'
+  attribute on the 'ontologies' element). -->
+<!ELEMENT ontologies (ontology*)>
+<!ATTLIST ontologies %attr.path;>
+<!ELEMENT ontology (attribute*)>
+<!ATTLIST ontology %attr.nameID; %attr.description; %attr.filename;
+        element-name CDATA #REQUIRED
+        attribute-name CDATA #REQUIRED>
+
+
+<!-- OBJECT SETS - corpora may also be associated with object sets
+ like a list of referents or similar. Object sets have no structure:
+ neither dominance nor precedence relationships may hold over an
+ object in an object set. The 'code' elements specify the names of the
+ objects that may appear in an object set and their attributes.
+ Objects in an object set may be heterogeneous. Note that the
+ 'text-content' attribute of 'code' elements defines whether text
+ content is permitted. If it is set to 'true', any content model in
+ terms of children and pointers is overridden because mixed content is
+ not permitted. -->
+<!ELEMENT object-sets (object-set*)>
+<!ATTLIST object-sets %attr.path;>
+<!ELEMENT object-set (code+)>
+<!ATTLIST object-set %attr.nameID; %attr.description; %attr.filename;>
+<!ELEMENT code (attribute*, pointer*)>
+<!ATTLIST code %attr.name;
+        text-content (true|false) 'false'>
+<!ELEMENT attribute (value*)> <!-- see defn of 'value' above -->
+<!ATTLIST attribute %attr.name;
+        value-type (string|number|enumerated) 'string'>
+<!ELEMENT pointer EMPTY>
+<!ATTLIST pointer 
+        role CDATA #REQUIRED
+        number CDATA #REQUIRED
+        target IDREF #IMPLIED >
+
+<!-- CODINGS - defined in meta-simple.dtd and meta-standoff.dtd -->
+<!-- <!ENTITY % codings-content '((agent-codings*, interaction-codings*) | (time-aligned-layer|structural-layer|featural-layer)*)'>
+-->
+<!-- <!ELEMENT codings (%codings-content;)>
+  <!ATTLIST codings %attr.path;>
+-->
+
+<!ELEMENT agent-codings (coding-file+)>
+<!ELEMENT interaction-codings (coding-file+)>
+<!-- There are three types of layers that can appear in a coding:
+  time-aligned-layer : directly aligned to signal; allowed pointers 
+  structural layer   : allowed children and pointers and inherits times
+     from any children with time
+  featural layer     : cannot appear in a dominance hierarchy but has
+      pointers 
+ -->
+<!ELEMENT coding-file (time-aligned-layer|structural-layer|featural-layer)*>
+<!ATTLIST coding-file %attr.nameID;>
+<!ELEMENT time-aligned-layer (code+)>
+<!ATTLIST time-aligned-layer %attr.nameID;>
+<!ELEMENT featural-layer (code+)>
+<!ATTLIST featural-layer %attr.nameID;>
+<!ELEMENT structural-layer (code+)>
+<!ATTLIST structural-layer %attr.nameID;
+        points-to IDREF #IMPLIED
+        recursive-points-to IDREF #IMPLIED
+        inherits-time (false|true) 'true'>
+
+
+<!-- STYLES - styles are the files that allow either NIE (NITE
+interface engine) of OTAB (annotation board) to produce an appropriate
+display. In the case of NIE, these files are stylesheets and in the
+case of OTAB they are specification files. -->
+<!ELEMENT styles (style*)>
+<!ATTLIST styles %attr.path;>
+<!ELEMENT style EMPTY>
+<!ATTLIST style %attr.nameID; %attr.description;
+	extension CDATA #REQUIRED
+	application (nie|otab) 'nie'
+	type (editor|display) 'display'>
+
+
+<!-- VIEWS - views are combinations of displays that combine to
+ produce an editing or display environment for a particular
+ purpose. Views can comprise zero or one NIE displays, zero or one
+ OTAB displays, and any number of video and audio windows. -->
+<!ELEMENT views (view*)>
+<!ELEMENT view (styled-window, styled-window?, video-window*, audio-window*)>
+<!ATTLIST view %attr.description;
+	type (editor|display) 'display'>
+<!-- nameref must point to a 'style' -->
+<!ELEMENT styled-window EMPTY>
+<!ATTLIST styled-window 
+        nameref IDREF #REQUIRED>
+<!-- nameref mist point to a video signal -->
+<!ELEMENT video-window EMPTY>
+<!ATTLIST video-window %attr.sound;
+        nameref IDREF #REQUIRED>
+<!-- nameref mist point to an audio signal -->
+<!ELEMENT audio-window EMPTY>
+<!ATTLIST audio-window %attr.sound;
+        nameref IDREF #REQUIRED>
+
+
+<!-- CALLABLE-PROGRAMS are externally callable programs for a
+particular corpus. We use these (in combination with any VIEWS present)
+to provide a top level view of the applications available for a corpus -->
+<!ELEMENT callable-programs (callable-program*)>
+<!ELEMENT callable-program (required-argument*)>
+<!ATTLIST callable-program %attr.description; %attr.name;>
+<!ELEMENT required-argument EMPTY>
+<!ATTLIST required-argument %attr.name; %attr.description; 
+	type (corpus|observation|unknown) 'unknown'
+	default CDATA #IMPLIED>
+
+<!-- OBSERVATIONS - The list of observations tells us the number of
+  actual observations in the corpus and the types of codings that have
+  been done on them. -->
+<!ELEMENT observations (observation+)>
+<!ELEMENT observation (variables?,user-codings*)>
+<!ATTLIST observation %attr.nameID;>
+<!ELEMENT variables (variable*)>
+<!ELEMENT variable EMPTY>
+<!ATTLIST variable %attr.name; 
+	value CDATA #REQUIRED>
+<!ELEMENT user-codings (user-coding*)>
+<!ELEMENT user-coding EMPTY>
+<!-- The name must refer to a coding -->
+<!ATTLIST user-coding 
+        name IDREF #REQUIRED
+	coder CDATA #IMPLIED
+	date CDATA #IMPLIED
+	checker CDATA #IMPLIED
+	status (unstarted|draft|final|checked) 'unstarted'>
+

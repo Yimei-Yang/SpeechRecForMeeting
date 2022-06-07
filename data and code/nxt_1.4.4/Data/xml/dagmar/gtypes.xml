@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gtype name="gesture" xmlns:nite="http://nite.sourceforge.net/" nite:id="gt_0">
+	<gtype nite:id="gt_1" name="adaptor">	
+		<gtype nite:id="gt_2" name="self-directed"/>
+		<gtype nite:id="gt_3" name="alter-directed"/>
+		<gtype nite:id="gt_4" name="object-directed"/>
+	</gtype>
+	<gtype nite:id="gt_5" name="emblem">	
+		<gtype nite:id="gt_6" name="part of body"/>
+		<gtype nite:id="gt_7" name="function of body"/>
+		<gtype nite:id="gt_8" name="baseed on task-oriented mvt"/>
+		<gtype nite:id="gt_9" name="perception of body"/>
+		<gtype nite:id="gt_10" name="artefact-handling"/>
+		<gtype nite:id="gt_11" name="pointing (deictic)"/>
+		<gtype nite:id="gt_12" name="socially conventionalised"/>
+		<gtype nite:id="gt_13" name="other"/>
+	</gtype>
+	<gtype nite:id="gt_14" name="illustrator">	
+		<gtype nite:id="gt_15" name="baton"/>
+		<gtype nite:id="gt_16" name="deictic"/>
+		<gtype nite:id="gt_17" name="iconic"/>
+		<gtype nite:id="gt_18" name="metaphoric"/>
+		<gtype nite:id="gt_19" name="other"/>
+	</gtype>
+	<gtype nite:id="gt_20" name="regulator">	
+		<gtype nite:id="gt_21" name="point"/>
+		<gtype nite:id="gt_22" name="position"/>
+		<gtype nite:id="gt_23" name="presentation"/>
+	</gtype>
+	<gtype nite:id="gt_24" name="task-oriented movement">	
+	</gtype>
+</gtype>

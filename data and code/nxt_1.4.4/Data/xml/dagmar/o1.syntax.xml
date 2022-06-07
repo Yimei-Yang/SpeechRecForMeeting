@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nite:root xmlns:nite="http://nite.sourceforge.net/" nite:id="sroot1">
+<syntax nite:id="s_0" cat="S">
+	<syntax nite:id="s_1" cat="NP" hlem="ich">
+		<nite:child href="o1.text.xml#w_0"/>
+	</syntax>
+	<syntax nite:id="s_2" cat="VP" hlem="überqueren">
+		<nite:child href="o1.text.xml#w_1"/>
+	</syntax>
+	<syntax nite:id="s_3" cat="NP" hlem="Zebrastreifen">
+		<nite:child href="o1.text.xml#w_2"/>
+		<nite:child href="o1.text.xml#w_3"/>
+	</syntax>
+</syntax>
+<syntax nite:id="s_4" cat="S">
+	<syntax nite:id="s_5" cat="CL" hlem="während">
+		<nite:child href="o1.text.xml#w_4"/>
+		<syntax nite:id="s_6" cat="NP" hlem="ich">
+			<nite:child href="o1.text.xml#w_5"/>
+		</syntax>
+		<syntax nite:id="s_7" cat="NP" hlem="d">
+			<nite:child href="o1.text.xml#w_6"/>
+		</syntax>
+		<syntax nite:id="s_8" cat="VP" hlem="machen">
+			<nite:child href="o1.text.xml#w_7"/>
+		</syntax>
+	</syntax>
+	<syntax nite:id="s_9" cat="VP" hlem="umspringen">
+		<nite:child href="o1.text.xml#w_8"/>
+	</syntax>
+	<syntax nite:id="s_10" cat="NP" hlem="Ampel">
+		<nite:child href="o1.text.xml#w_9"/>
+		<nite:child href="o1.text.xml#w_10"/>
+	</syntax>
+	<syntax nite:id="s_11" cat="PP" hlem="von:Grün">
+		<nite:child href="o1.text.xml#w_11"/>
+		<syntax nite:id="s_12" cat="NP" hlem="Grün">
+			<nite:child href="o1.text.xml#w_12"/>
+		</syntax>
+	</syntax>
+	<syntax nite:id="s_13" cat="PP" hlem="auf:Rot">
+		<nite:child href="o1.text.xml#w_13"/>
+		<syntax nite:id="s_14" cat="NP" hlem="Rot">
+			<nite:child href="o1.text.xml#w_14"/>
+		</syntax>
+	</syntax>
+	<nite:child href="o1.text.xml#w_15"/>
+</syntax>
+<syntax nite:id="s_15" cat="S">
+	<syntax nite:id="s_16" cat="NP" hlem="Autofahrer">
+		<nite:child href="o1.text.xml#w_16"/>
+		<syntax nite:id="s_17" cat="AP" hlem="ungeduldig">
+			<nite:child href="o1.text.xml#w_17"/>
+		</syntax>
+		<nite:child href="o1.text.xml#w_18"/>
+	</syntax>
+	<syntax nite:id="s_18" cat="VP" hlem="fahren">
+		<nite:child href="o1.text.xml#w_19"/>
+	</syntax>
+	<syntax nite:id="s_19" cat="AP" hlem="seitlich">
+		<nite:child href="o1.text.xml#w_20"/>
+	</syntax>
+	<syntax nite:id="s_20" cat="PP" hlem="an:Kniescheibe">
+		<nite:child href="o1.text.xml#w_21"/>
+		<syntax nite:id="s_21" cat="NP" hlem="Kniescheibe">
+			<nite:child href="o1.text.xml#w_22"/>
+			<nite:child href="o1.text.xml#w_23"/>
+		</syntax>
+	</syntax>
+	<nite:child href="o1.text.xml#w_24"/>
+	<nite:child href="o1.text.xml#w_25"/>
+	<syntax nite:id="s_22" cat="VP" hlem="machen">
+		<nite:child href="o1.text.xml#w_26"/>
+	</syntax>
+	<syntax nite:id="s_23" cat="NP" hlem="Handbewegung">
+		<nite:child href="o1.text.xml#w_27"/>
+		<nite:child href="o1.text.xml#w_28"/>
+	</syntax>
+	<syntax nite:id="s_24" cat="CL" hlem="damit">
+		<nite:child href="o1.text.xml#w_29"/>
+		<syntax nite:id="s_25" cat="NP" hlem="ich">
+			<nite:child href="o1.text.xml#w_30"/>
+		</syntax>
+		<syntax nite:id="s_26" cat="NP" hlem="ich">
+			<nite:child href="o1.text.xml#w_31"/>
+		</syntax>
+		<syntax nite:id="s_27" cat="VP" hlem="beeilen">
+			<nite:child href="o1.text.xml#w_32"/>
+			<nite:child href="o1.text.xml#w_33"/>
+		</syntax>
+	</syntax>
+</syntax>
+<syntax nite:id="s_28" cat="S">
+	<syntax nite:id="s_29" cat="NP" hlem="ich">
+		<nite:child href="o1.text.xml#w_34"/>
+	</syntax>
+	<syntax nite:id="s_30" cat="VP" hlem="machen">
+		<nite:child href="o1.text.xml#w_35"/>
+	</syntax>
+	<syntax nite:id="s_31" cat="AP" hlem="unwillig">
+		<nite:child href="o1.text.xml#w_36"/>
+	</syntax>
+	<syntax nite:id="s_32" cat="CL" hlem="weil">
+		<nite:child href="o1.text.xml#w_37"/>
+		<syntax nite:id="s_33" cat="NP" hlem="ich">
+			<nite:child href="o1.text.xml#w_38"/>
+		</syntax>
+		<syntax nite:id="s_34" cat="PP" hlem="bei:Grün">
+			<nite:child href="o1.text.xml#w_39"/>
+			<syntax nite:id="s_35" cat="NP" hlem="Grün">
+				<nite:child href="o1.text.xml#w_40"/>
+			</syntax>
+		</syntax>
+		<syntax nite:id="s_36" cat="VP" hlem="starten">
+			<nite:child href="o1.text.xml#w_41"/>
+			<nite:child href="o1.text.xml#w_42"/>
+		</syntax>
+	</syntax>
+	<syntax nite:id="s_37" cat="ADVP" hlem="so">
+		<nite:child href="o1.text.xml#w_43"/>
+	</syntax>
+	<nite:child href="o1.text.xml#w_44"/>
+	<syntax nite:id="s_38" cat="NP" hlem="er">
+		<nite:child href="o1.text.xml#w_45"/>
+	</syntax>
+</syntax>
+<syntax nite:id="s_39" cat="S">
+	<nite:child href="o1.text.xml#w_46"/>
+	<syntax nite:id="s_40" cat="NP" hlem="Frau">
+		<nite:child href="o1.text.xml#w_47"/>
+		<nite:child href="o1.text.xml#w_48"/>
+	</syntax>
+	<syntax nite:id="s_41" cat="NP" hlem="d">
+		<nite:child href="o1.text.xml#w_49"/>
+	</syntax>
+	<syntax nite:id="s_42" cat="PP" hlem="an:Straßenseite">
+		<nite:child href="o1.text.xml#w_50"/>
+		<syntax nite:id="s_43" cat="NP" hlem="Straßenseite">
+			<syntax nite:id="s_44" cat="AP" hlem="gegenüberliegend">
+				<nite:child href="o1.text.xml#w_51"/>
+			</syntax>
+			<nite:child href="o1.text.xml#w_52"/>
+		</syntax>
+	</syntax>
+	<syntax nite:id="s_45" cat="NP" hlem="d">
+		<nite:child href="o1.text.xml#w_53"/>
+	</syntax>
+	<syntax nite:id="s_46" cat="NP" hlem="Sache">
+		<nite:child href="o1.text.xml#w_54"/>
+		<syntax nite:id="s_47" cat="AP" hlem="ganz">
+			<nite:child href="o1.text.xml#w_55"/>
+		</syntax>
+		<nite:child href="o1.text.xml#w_56"/>
+	</syntax>
+	<syntax nite:id="s_48" cat="AP" hlem="beobachtet">
+		<nite:child href="o1.text.xml#w_57"/>
+	</syntax>
+	<syntax nite:id="s_49" cat="VP" hlem="machen">
+		<nite:child href="o1.text.xml#w_58"/>
+		<nite:child href="o1.text.xml#w_59"/>
+	</syntax>
+	<syntax nite:id="s_50" cat="VP" hlem="machen">
+		<nite:child href="o1.text.xml#w_60"/>
+	</syntax>
+	<syntax nite:id="s_51" cat="PP" hlem="zu:ich">
+		<nite:child href="o1.text.xml#w_61"/>
+		<syntax nite:id="s_52" cat="NP" hlem="ich">
+			<nite:child href="o1.text.xml#w_62"/>
+		</syntax>
+	</syntax>
+	<syntax nite:id="s_53" cat="NP" hlem="Geste">
+		<nite:child href="o1.text.xml#w_63"/>
+		<syntax nite:id="s_54" cat="AP" hlem="bestätigend">
+			<nite:child href="o1.text.xml#w_64"/>
+		</syntax>
+		<nite:child href="o1.text.xml#w_65"/>
+	</syntax>
+	<nite:child href="o1.text.xml#w_66"/>
+	<syntax nite:id="s_55" cat="NP" hlem="ich">
+		<nite:child href="o1.text.xml#w_67"/>
+	</syntax>
+	<syntax nite:id="s_56" cat="AP" hlem="situationsgerecht">
+		<syntax nite:id="s_57" cat="AP" hlem="vollig">
+			<nite:child href="o1.text.xml#w_68"/>
+		</syntax>
+		<nite:child href="o1.text.xml#w_69"/>
+	</syntax>
+	<syntax nite:id="s_58" cat="VP" hlem="handeln">
+		<nite:child href="o1.text.xml#w_70"/>
+		<nite:child href="o1.text.xml#w_71"/>
+	</syntax>
+</syntax>
+</nite:root>

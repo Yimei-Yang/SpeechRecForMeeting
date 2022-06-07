@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<trans scribe="(unknown)" audio_filename="match_woz_subj_O1_A4" version="2" version_date="070528">
+<speakers>
+<speaker id="spk1" name="wizard" check="no" type="female" dialect="native" accent="" scope="local"/>
+<speaker id="spk2" name="user" check="no" type="male" dialect="native" accent="" scope="local"/>
+</speakers>
+<episode>
+<section type="report" starttime="0" endtime="104.908">
+<turn starttime="0" endtime="19.135" speaker="spk1" mode="planned">
+<sync time="0"/>
+garbage
+<sync time="18.522"/>
+
+</turn>
+<turn speaker="spk2" mode="spontaneous" starttime="19.135" endtime="19.635">
+<sync time="19.135"/>
+Morning.
+</turn>
+<turn speaker="spk1" mode="spontaneous" starttime="19.635" endtime="29.228">
+<sync time="19.635"/>
+
+</turn>
+<turn speaker="spk2" mode="spontaneous" starttime="29.228" endtime="31.385">
+<sync time="29.228"/>
+Uh physiotherapist please, good morning.
+</turn>
+<turn speaker="spk1" mode="spontaneous" starttime="31.385" endtime="39.76">
+<sync time="31.385"/>
+
+</turn>
+<turn speaker="spk2" mode="spontaneous" starttime="39.76" endtime="47.068">
+<sync time="39.76"/>
+I can't make Wednesday afternoon, but I can make Thursday afternoon, but it would need to be after two thirty. Thursday afternoon, after two thirty, please.
+</turn>
+<turn speaker="spk1" mode="spontaneous" starttime="47.068" endtime="54.565">
+<sync time="47.068"/>
+
+</turn>
+<turn speaker="spk1 spk2" mode="spontaneous" starttime="54.565" endtime="55.221">
+<sync time="54.565"/>
+<who nb="1"/>
+
+<who nb="2"/>
+Three o'clock.
+</turn>
+<turn speaker="spk1" mode="spontaneous" starttime="55.221" endtime="57.691">
+<sync time="55.221"/>
+
+</turn>
+<turn speaker="spk2" mode="spontaneous" starttime="57.691" endtime="60.818">
+<sync time="57.691"/>
+Sorry? Can you repeat that please?
+</turn>
+<turn speaker="spk1" mode="spontaneous" starttime="60.818" endtime="66.505">
+<sync time="60.818"/>
+
+</turn>
+<turn speaker="spk2" mode="spontaneous" starttime="66.505" endtime="67.974">
+<sync time="66.505"/>
+Three P_M_ is fine, thank you.
+</turn>
+<turn speaker="spk1" mode="spontaneous" starttime="67.974" endtime="81.859">
+<sync time="67.974"/>
+
+</turn>
+<turn speaker="spk2" mode="spontaneous" starttime="81.859" endtime="86.304">
+<sync time="81.859"/>
+Thursday three P_M_, physio, w- the G_P_ practice, that's correct, thank you.
+</turn>
+<turn speaker="spk1" mode="spontaneous" starttime="86.304" endtime="93.428">
+<sync time="86.304"/>
+
+</turn>
+<turn speaker="spk2" mode="spontaneous" starttime="93.428" endtime="104.908">
+<sync time="93.428"/>
+You're welcome, thank you, goodbye.
+<sync time="94.995"/>
+garbage
+</turn>
+</section>
+</episode>
+</trans>

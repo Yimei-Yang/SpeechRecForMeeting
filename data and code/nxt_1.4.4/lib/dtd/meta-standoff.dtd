@@ -1,0 +1,24 @@
+<!-- Jonathan Kilgour 31/1/03 -->
+<!-- a DTD describing metadata for standoff NITE corpora -->
+<!-- use with a DOCTYPE declaration like this in your XML:
+ <!DOCTYPE corpus PUBLIC "-//W3C//DTD META-STANDOFF 20030503//EN" "path-to/meta-standoff.dtd">
+-->
+
+<!ENTITY % conditional 'INCLUDE'>
+
+<![%conditional;[
+<!ENTITY  % base-decl SYSTEM "meta.dtd">
+%base-decl;
+]]>
+
+<!-- CODINGS - codings specify the format of the main body of the data
+ in a corpus. Codings (like signals) can be divided into those that
+ are interaction codings (covering all interactants) and those that
+ are agent codings (one per agent). Note though, for standoff corpora,
+ codings break down directly into layers (as there's only one file
+ involved). Codings also determine the serialization of files in the
+ corpus. -->
+<!ELEMENT codings (agent-codings*, interaction-codings*)>
+<!ATTLIST codings %attr.path;>
+
+<!-- <!ENTITY % codings-content '(agent-codings*, interaction-codings*)'> -->

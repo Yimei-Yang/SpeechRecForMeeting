@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<nite:stream nite:id="gs_1" xmlns:nite="http://nite.sourceforge.net/">
+   <gest1 nite:id="go_1">
+      <nite:pointer href="o1.gestures-right.xml#id('ge_1')"/>
+   </gest1>
+   <gest1 nite:id="go_2">
+      <nite:pointer href="o1.gestures-left.xml#id('lge_1')"/>
+   </gest1>
+</nite:stream>

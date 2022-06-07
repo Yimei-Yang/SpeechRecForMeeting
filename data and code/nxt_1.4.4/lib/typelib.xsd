@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+
+<xsd:schema targetNamespace="http://nite.sourceforge.net/"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"  
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            xmlns:nite="http://nite.sourceforge.net/"
+>
+   
+   <xsd:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink.xsd"/>
+
+<!-- alternate name for the stream element - this one is
+     Holger-sanctioned -->
+   <xsd:element type="nite:Stream" name="root" >
+   <xsd:unique name="stream-uniqueness-constraint">
+   <xsd:selector xpath="*"/>
+   <xsd:field xpath="@nite:id"/>
+   </xsd:unique>
+   </xsd:element>
+
+
+   <xsd:attribute name="id" type="xsd:string" />
+   <xsd:attribute name="start" type="xsd:decimal"/>
+   <xsd:attribute name="end" type="xsd:decimal"/>
+ 
+   <!-- NITE global attributes -->
+   <xsd:attributeGroup name="nite-attributes">
+<!--
+      <xsd:attribute ref="nite:id" use="required"/>
+-->
+<!-- because we can't have a namespaced xsd:ID, we make them un-namespaced -->
+      <xsd:attribute name="id" use="required" type="xsd:ID"/>
+      <xsd:attribute name="agent" type="xsd:string"/>
+   </xsd:attributeGroup> 
+   
+   <!-- NITE attributes for structural or time-aligned layer elements -->
+   <xsd:attributeGroup name="nite-timed-attributes">      
+      <xsd:attributeGroup ref="nite:nite-attributes"/>
+      <xsd:attribute ref="nite:start"/>
+      <xsd:attribute ref="nite:end"/>
+   </xsd:attributeGroup>
+  
+   <!-- NITE abstract elements -->
+   <xsd:element name="abstract-stream" type="nite:Stream" abstract="true"/>   
+   <xsd:element name="abstract-stream-token" type="nite:StreamToken" abstract="true"/>
+   <xsd:element name="abstract-role" type="nite:Role" abstract="true"/>
+
+   <!-- NITE global elements -->
+   <xsd:element name="pointer" type="nite:Pointer"/>
+   <xsd:element name="child" type="nite:Child"/>
+
+
+
+   <!--   ***********   NITE type library   *************    -->
+
+
+   <!-- NITE type for streams -->
+   <xsd:complexType name="Stream">
+    <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+<!--     <xsd:element ref="nite:abstract-element"/> -->
+     <xsd:any/>
+    </xsd:sequence> 
+    <xsd:attributeGroup ref="nite:nite-attributes"/>
+   </xsd:complexType>
+
+
+   <!-- NITE type for elements in structural / time-aligned layers -->
+   <xsd:complexType name="StructuralToken">
+      <xsd:complexContent>
+         <xsd:restriction base="xsd:anyType">
+            <xsd:sequence>
+               <xsd:element ref="nite:child" minOccurs="0" maxOccurs="unbounded"/>
+               <xsd:element ref="nite:pointer" minOccurs="0" maxOccurs="unbounded"/>
+	       <xsd:element ref="nite:abstract-pseudo-element" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+            <xsd:attributeGroup ref="nite:nite-timed-attributes"/>
+         </xsd:restriction>
+      </xsd:complexContent>
+   </xsd:complexType>
+
+   <!-- NITE type for elements in featural layers -->
+   <xsd:complexType name="FeaturalToken">
+      <xsd:complexContent>
+         <xsd:restriction base="nite:StructuralToken">
+            <xsd:sequence>
+               <xsd:element ref="nite:pointer" minOccurs="0" maxOccurs="unbounded"/>
+
+<!-- this recursion causes an error - can't have it without the
+  namespace, and isn't accepted without it either -->
+<!--	       <xsd:element ref="nite:FeaturalToken" minOccurs="0" maxOccurs="unbounded"/> -->
+            </xsd:sequence>
+            <xsd:attributeGroup ref="nite:nite-attributes"/>
+         </xsd:restriction>
+      </xsd:complexContent>
+   </xsd:complexType>
+
+   <!-- NITE abstract type for other defined elements (not converted
+        pointer elements - see below) -->
+   <xsd:element name="abstract-element" type="nite:Element" abstract="true"/>
+   <xsd:complexType name="Element">
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:choice>
+          <xsd:element ref="nite:child"/>
+          <xsd:element ref="nite:pointer"/>
+        </xsd:choice>
+        <xsd:element ref="nite:abstract-pseudo-element" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attributeGroup ref="nite:nite-attributes"/>
+   </xsd:complexType>
+
+   <!-- NITE abstract type for converted pointer element
+        pseudo-children (no IDs) -->
+   <xsd:element name="abstract-pseudo-element" type="nite:PseudoElement" abstract="true"/>
+   <xsd:complexType name="PseudoElement">
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element ref="nite:abstract-pseudo-element" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+ 
+   <!--declarations for type hiearchies -->
+   <xsd:element name="abstract-type-definition" type="nite:TypeDefinition" abstract="true"/>
+   <xsd:complexType name="TypeDefinition">
+     <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+      <xsd:element ref="nite:abstract-type-definition"/>
+     </xsd:sequence>
+     <xsd:attribute name="type" type="xsd:string"/>
+     <xsd:attributeGroup ref="nite:nite-attributes"/>
+   </xsd:complexType>
+
+   <!-- NITE special elements -->
+   <xsd:complexType name="Pointer">
+    <xsd:complexContent>
+     <xsd:restriction base="xsd:anyType">
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+       <xsd:element ref="nite:abstract-element"/>
+      </xsd:sequence>
+      <xsd:attribute name="role" type="xsd:string"/>
+<!--      <xsd:attribute name="href" type="xsd:string"/> -->
+      <xsd:attribute ref="xlink:href"/> 
+      <xsd:attribute ref="xlink:type"/>
+     </xsd:restriction>
+    </xsd:complexContent>
+   </xsd:complexType>
+
+   <xsd:complexType name="Child">
+      <xsd:complexContent>
+         <xsd:restriction base="xsd:anyType">
+<!--            <xsd:attribute name="href" type="xsd:string"/> -->
+            <xsd:attribute ref="xlink:href"/>
+            <xsd:attribute ref="xlink:type"/>
+         </xsd:restriction>
+      </xsd:complexContent>
+   </xsd:complexType>
+
+   <xsd:complexType name="Role">
+      <xsd:complexContent>
+         <xsd:restriction base="xsd:anyType">
+            <xsd:attribute name="pointer" type="xsd:boolean" use="required"/>
+            <xsd:attribute name="ref" type="xsd:string"/>
+         </xsd:restriction>
+      </xsd:complexContent>
+   </xsd:complexType>
+
+
+</xsd:schema>
+

@@ -1,0 +1,28 @@
+
+How to schema-validate a NOM corpus:
+-----------------------------------
+19/2/03 Jonathan Kilgour.
+
+First run the utility program
+ java PrepareSchemaValidation -c <corpus-metadata-file> -o <outdir>
+
+This program should be present in your NITE distribution.
+
+The output directory will now contain what you need for
+schema-validating your corpus. First choose your schema validator (we
+use xsv in these examples) and try it on one of your files, for example:
+ xsv o1.words.xml
+Check for errors. Please note that if the instance has not been
+assessed and there are schema errors, something has gone wrong with
+the preparation. Please send jonathan@cogsci.ed.ac.uk your metadata
+file!
+
+If your corpus is valid, you will find that not only will all the XML
+files in your corpus validate, but that the "knit" versions also
+validate. Knitting involves inserting referenced children and pointers
+as real child nodes in your corpus, so that you can check that those
+are valid. Try:
+ java org.apache.xalan.xslt.Process -in o1.words.xml -xsl knit.xsl -out words1.xml
+and then: xsv words1.xml
+This will check for invalid children and pointers in the file
+"o1.words.xml".

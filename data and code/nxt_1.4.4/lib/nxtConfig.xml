@@ -1,0 +1,196 @@
+<NXTConfig>
+
+<CSLConfig>
+
+    <!-- This section contains the configuration settings for the VideoLabeler tool developed in Twente
+         for the AMI project. For documentation purposes it contains one corpussettings entry that is not connected
+         to an actual corpus but rather explains all possible corpus-dependent settings. Furthermore it contains 
+         appropriate default settings for at least the AMI pilot corpus.
+         If you want to use the VideoLabeler on your own corpus, duplicate a corpussettings entry, fill in 
+         the appropriate attributes with the correct settings for your corpus and add an entry directly below this 
+         comment to connect the metadatafile to those new settings. If you want to use those tools 
+         on the AMI pilot corpus, change the metadatafile entry below so it points to the correct metadata file.
+         If all works as it should, the tool should be able to automatically find this config file (it should reside
+         on the CLASSPATH), and will use the correct corpussettings and guisettings for any corpus for which an entry
+         'metadatafile' exists.
+         If things don't work that way, please drop a note to dennisr at hmi dot utwente dot nl
+         -->
+    
+    <!-- CHANGE THIS SECTION FOR YOUR OWN METADATAFILES -->
+    <metadatafile file="Data/meta/dagmar-metadata.xml"      corpussettings="csl-cs-dagmar"   guisettings="csl-gs-default"/>
+    
+    <!-- An example set of settings, used to explain what the settings mean. -->
+    <corpussettings
+        id="csl-cs-example"
+        gloss="Example CSL settings, givig an explanation for every entry."
+        annotatorspecificcodings= "the semi-colon-separated list of codings that are annotator specific, i.e. for which each individual annotator will get his or her own datafiles. Usually these are the codings for all layers that will be annotated in the CSLCoder; see AMI example. This setting only has effect when the tool is started for a named annotator."
+    >
+        <layerinfo 
+            id="examplelayerinfo"
+            gloss="A layerinfo element contains important information for exactly one layer"
+            codename="Name of the elements that are annotated in the given layer"
+            layername="The name of the layer that you want to code in the video labeler"
+            layerclass="Delegate AnnotationLayer class. Usually net.sourceforge.nite.tools.videolabeler.LabelAnnotationLayer"
+            controlpanelclass="Delegate TargetControlPanel class. Usually net.sourceforge.nite.tools.videolabeler.LabelTargetControlPanel"
+
+            pointerrole="Required for LabelAnnotationLayer: role of the pointer that points to the object set or ontology that contains the labels."
+            labelattribute="Required for LabelAnnotationLayer: name of the attribute of an object set or ontology element that contains the label name."
+            
+            evaluationattribute="Required for FeeltraceAnnotationLayer: name of the double value attribute that contains the evaluation of an emotion."
+            activationattribute="Required for FeeltraceAnnotationLayer: name of the double value attribute that contains the activation of an emotion."
+            showlabels="Optional (default true) for FeeltraceTargetControlPanel: if true, labels for some predefined emotions will be shown in the Feeltrace circle."
+            clickannotation="Optional (default false) for FeeltraceTargetControlPanel: if true, the user can click to start and end annotating; if false, the user should keep the mouse button pressed while annotating."
+        />
+    </corpussettings>
+
+    <corpussettings
+        id="csl-cs-dagmar"
+        gloss="Example CSL settings for Dagmar demo corpus"
+        annotatorspecificcodings= "pose"
+    >
+        <layerinfo 
+            id="poselayerinfo"
+            gloss="Annotationlayer for postures"
+            layername="posture-layer"
+            layerclass="net.sourceforge.nite.tools.videolabeler.LabelAnnotationLayer"
+            controlpanelclass="net.sourceforge.nite.tools.videolabeler.LabelTargetControlPanel"
+            codename="posture"
+            pointerrole="TYPE"
+            labelattribute="name"
+        />
+        <layerinfo 
+            id="gesturelayerinfo"
+            gloss="Annotationlayer for gestures"
+            layername="gesture-layer"
+            layerclass="net.sourceforge.nite.tools.videolabeler.LabelAnnotationLayer"
+            controlpanelclass="net.sourceforge.nite.tools.videolabeler.TreeTargetControlPanel"
+            codename="gesture"
+            pointerrole="TYPE"
+            labelattribute="name"
+        />
+        
+    </corpussettings>
+    
+    <guisettings
+        id="csl-gs-example"
+        gloss="Example CSL settings, giving an explanation for every entry."
+        autokeystrokes="Optional (default false): if true, keystrokes will be made automatically if no keystroke is defined in the corpus data or if the defined keystroke is already in use."
+        showkeystrokes="Optional (default off): set to off (keystroke won't be shown in the GUI), tooltip (keystroke will be shown in the tooltip of a control) or label (keystroke will be shown in the label of a control)."
+        continuous="Optional (default true): if true, the CSL tool will ensure that annotations remain continuous (prevent gaps in the time line)"
+        syncrate="Optional (default 200): the number of milliseconds between time change events from the NXT clock"
+        timedisplay="Optional (default seconds): the type of display of coding times in the annotation window: if 'minutes' then the format is like that of the clock h:mm:ss.ms"
+    />
+    
+    <!-- Default gui settings -->
+    <guisettings
+        id="csl-gs-default"
+        gloss="Default GUI settings for the CSL tool"
+    />
+    
+
+</CSLConfig>
+
+<DACoderConfig>
+    <!-- This section contains the configuration settings for the AMI DACoder and NECoder tools developed in Twente
+         for the AMI project. For documentation purposes it contains one corpussettings entry that is not connected
+         to an actual corpus but rather explains all possible corpus-dependent settings. Furthermore it contains 
+         appropriate default settings for at least the AMI pilot corpus and the ICSI corpus (Edinburgh CVS).
+         If you want to use the DACoder or NECoder on your own corpus, duplicate a corpussettings entry, fill in 
+         the appropriate attributes with the correct settings for your corpus and add an entry directly below this 
+         comment to connect the metadatafile to those new settings. If you want to use those tools on the ICSI corpus
+         or the AMI pilot corpus, change the metadatafile entries below so they point to the correct metadata files.
+         For the ICSI corpus you should also add the appropriate layer definitions and the ontology files (see README 
+         in Contributions/Anno22L).
+         If all works as it should, the tool should be able to automatically find this config file (it should reside
+         on the CLASSPATH), and will use the correct corpussettings and guisettings for any corpus for which an entry
+         'metadatafile' exists.
+         If things don't work that way, please drop a note to dennisr at hmi dot utwente dot nl
+         -->
+
+    <!-- CHANGE THIS SECTION FOR YOUR OWN METADATAFILES -->
+    <metadatafile file="Data/meta/icsi-metadata.xml"  corpussettings="dac-cs-icsi"  guisettings="dac-gs-default"/>
+    <!-- There may be some setting attributes missing, still... If it's not in the default list below (dac-cs-example),
+         it wasn't implemented yet. Need some new settings? Request it on sourceforge... -->
+    <corpussettings
+        id                      = "dac-cs-example"
+        gloss                   = "Example element containing short explanation of all possible settings"
+        
+        segmentationelementname = "Element name of the segmentation elements that pre-segments the transcription layer. Used for the initial display of the text."
+        transcriptionlayername  = "LAYER name of the transcription layer"
+        transcriptionattribute  = "Name of the attribute in which text of transcription is stored. Leave out if text not stored in attribute."
+        transcriptiondelegateclassname = "full class name of TranscriptionToTextDelegate. Leave out is no delegate is used"
+
+        daelementname           = "element name of dialogue act instances"
+        daontology              = "ontology name of dialogue acts"
+        daroot                  = "nite-id of dialogue act root"
+        datyperole              = "role name of the pointer from a dialogue act to its type"
+        dagloss                 = "the name of the attribute of the dialog act types that contains some extra description of the meaning of this type"
+
+        apelementname           = "element name of adjacency pair instances"
+        apgloss                 = "the name of the attribute of the relation types that contains some extra description of the meaning of this type"
+        apontology              = "ontology name of adjacency pairs"
+        aproot                  = "nite-id of adjacency pair root"
+        defaultaptype           = "nite-id of default adjacency pair type"
+        aptyperole              = "role name of the pointer from a AP to its type"
+        apsourcerole            = "role name of the pointer from a AP to its source"
+        aptargetrole            = "role name of the pointer from a AP to its target"
+
+        neelementname           = "element name of named entity instances"
+        neontology              = "ontology name of named entities"
+        neroot                  = "nite-id of named entities root"
+        nenameattribute         = "attribute name of the attribute that contains the name of the named entity"
+        netyperole              = "role name of the pointer from a named entity to its type"
+        abbrevattribute         = "name of the attribute which contains an abbreviated code for the named entity for in-text display"
+        
+        annotatorspecificcodings= "the semi-colon-separated list of codings that are annotator specific, i.e. for which each individual annotator will get his or her own datafiles. Usually these are the codings for all layers that will be annotated in the DACoder; see AMI example. This setting only has effect when the tool is started for a named annotator."
+    />    
+    
+    <!-- Corpus settings for the ICSI corpus -->
+    <corpussettings
+        id                      = "dac-cs-icsi"
+        segmentationelementname = "dialogueact"
+        transcriptionlayername  = "words-layer"
+        transcriptiondelegateclassname = "net.sourceforge.nite.gui.util.ICSITranscriptionToTextDelegate"
+        
+        daelementname           = "dact"
+        daontology              = "da-types"
+        daroot                  = "cmrda"
+        datyperole              = "type"
+        dagloss                 = "gloss"
+        
+        apelementname           = "adjacency-pair"
+        apgloss                 = "gloss"
+        apontology              = "ap-types"
+        aproot                  = "apt_0"
+        defaultaptype           = "apt_1"
+        aptyperole              = "type"
+        apsourcerole            = "source"
+        aptargetrole            = "target"
+        
+        neelementname           = "named-entity"
+        neontology              = "ne-types"
+        neroot                  = "ne_0"
+        nenameattribute         = "name"
+        netyperole              = "type"
+        abbrevattribute         = "abbrev"
+
+        annotatorspecificcodings= "dialog-act;nees"
+    />    
+    <guisettings
+        id                      = "dac-gs-example"
+        gloss                   = "Example element containing short explanation of all possible settings"
+        showapwindow            = "If true, the Adjacency Pair window is shown."
+        showlogwindow           = "If true, the log feedback window is shown."
+        applicationtitle        = "The title that you want to see in the main frame... (no reason to make this a setting, except that it's funny :-)"
+    />
+    <guisettings
+        id                      = "dac-gs-default"
+        gloss                   = "Default settings x"
+        showapwindow            = "true"
+        showlogwindow           = "true"
+        applicationtitle        = "AMI Dialogue act coder"
+        continuous="true"
+    />
+</DACoderConfig>
+
+</NXTConfig>

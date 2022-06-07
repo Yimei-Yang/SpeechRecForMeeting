@@ -1,0 +1,285 @@
+#!/usr/bin/perl
+
+use XML::XPath;
+use XML::XPath::XMLParser;
+
+# jonathan kilgour 10/1/4
+#
+
+# Reads in a split-by-user (and slightly altered) channeltrans file
+# and splits it into a word stream using split-on-spaces and a move
+# file that sits on top of it and has a start and end time.
+
+# Using an XML-aware perl process here as it's easier than using
+# stylesheets: there are some cases to take care of that are easier
+# with decent string manipulation...
+
+# A hyphenated word (e.g. "th-") becomes <w trunc="yes">th</w>
+# A lonely hyphen (not attached to a word) becomes <disfmarker/>
+# plus rules for pronounciation / emphasis??
+
+# default settings - can be changed using arguments
+$wordfile="words";
+$wordelement="w";
+$segmentfile="segments";
+$segmentelement="segment";
+
+# change these if you want different attribute names.
+$PUNCATT="punc";
+$STIMEATT="starttime";
+$ETIMEATT="endtime";
+$IDATT="nite:id";
+$CHANATT="channel";
+
+# sadly, ID generation in XSLT on my platform adds commas into numbers
+# meaning we have to do the same here. Ugh.
+sub commatize {
+    my($num) = @_;
+    if ($num<1000) { return $num; }
+    $num =~ s/(\d?\d?\d)(\d\d\d)\b/$1\,$2/g;
+    return $num;
+}
+
+sub usage {
+    print STDERR "Usage: split-words -ob observationname -a agent -i <input_dir> [-o <output_dir> ] [-we <word_element_name>] [-wf <word_file_name>] [-se <segment_element_name>] [-sf <segment_file_name>] \n";
+    exit 1;
+}
+
+# This splits words from a transcription on spaces, does any handling
+# of characters with special meaning (i.e. it encodes the
+# AMI Transcription Guidelines), adds the words to the wordstream, and
+# adds them as nite:child elements of the current segment element.
+sub handleText {
+    my($text, $segnode, $wordstream, $fname) = @_;
+    $invoc="";
+    $halfword=""; # store the first half of a two-word {NVC mic high} thing...
+    $lastid="";
+
+    $t = $text;
+    while ($t=~m{\[([^\]]*)\]}) {   #WAS: ($t=~m{\[(.*)\]}) - fixed by Craig Nicol 6/7/6
+	$m = $1;
+	$om=$m;
+	$m =~s/\s/\_/g;
+	$text=~s/\[$om\]/\[$m\]/;
+	# print stderr "Replace [$om] with [$m]\n";
+	last;
+    };
+
+    $pron="";
+    foreach $w (split(/ +/,$text)) {
+	$endpron=-1;
+	if (!$w) { next; }
+	$punc="";
+
+	if ($w=~/^\^/) {
+	    $pron="foreign";
+	    $w=~s/^\^//;
+	}
+	if ($w=~/\^/) {
+	    #print STDERR "END PRON: '$w'\n";
+	    $endpron=1;
+	    $w=~s/\^//;
+	}
+
+	if ($w!~/^\?\?$/ && $w=~/([.|?|!|,|;|:])$/) {
+	    #print STDERR "Chopping word $w\n";
+	    $punc=$1;
+	    chop($w);
+	}
+
+	$kidel = XML::XPath::Node::Element->new("nite:child");
+	$myid="$fname$wordcount";
+	$att = XML::XPath::Node::Attribute->new('href', "$fname\.xml\#id($myid)" );
+	$kidel->appendAttribute($att);
+	$segnode->appendChild($kidel);
+	
+	if ($w =~/^\-$/) { # disfluency
+	    $wordel = XML::XPath::Node::Element->new("disfmarker");
+	} elsif ($w =~/^(|\%|\$|\#)$/ || $w=~/^\[/) { # cough, laugh, other noise
+	    if ($w=~/^\[/) {
+		print STDERR "SPECIAL: '$w'\n";
+	    }
+	    $wordel = XML::XPath::Node::Element->new("vocalsound");
+	    $val="other";
+	    if ($1=~/^\$/) { $val="laugh"; }
+	    elsif ($1=~/^\%/) { $val="cough"; }
+	    elsif ($w=~/^\[(.*)\]$/) {
+		$val=$1;
+		$val=~s/\_/ /g;
+	    }
+	    $wordel->appendAttribute(XML::XPath::Node::Attribute->new('type', "$val"));
+	} elsif ($w =~/^\@$/) { # gap
+	    $wordel = XML::XPath::Node::Element->new("gap");
+	} else {
+	    $wordel = XML::XPath::Node::Element->new("$wordelement");
+	    if ($w=~/\-$/) {
+		$w=~s/\-$//;
+		$wordel->appendAttribute(XML::XPath::Node::Attribute->new('trunc', 'true'));
+	    }
+	    if ($w=~/\*$/) {
+		$w=~s/\*$//;
+		$wordel->appendAttribute(XML::XPath::Node::Attribute->new('mispronounced', 'true'));
+	    }
+	    $w =~s/^\(//;
+	    $w =~s/\)$//;
+	    $wordel->appendChild(XML::XPath::Node::Text->new($w));
+	}
+	if ($pron && $pron!~/^\s$/) {
+	    $wordel->appendAttribute(XML::XPath::Node::Attribute->new('pron', "$pron"));
+	}
+	$wordel->appendAttribute(XML::XPath::Node::Attribute->new('nite:id', "$myid"));
+	$wordstream->appendChild($wordel);
+	$tnode = XML::XPath::Node::Text->new("\n");
+	$wordcount++;
+	if ($punc) {
+	    $wordstream->appendChild($tnode);
+	    $wordel = XML::XPath::Node::Element->new("$wordelement");
+	    $wordel->appendAttribute(XML::XPath::Node::Attribute->new($PUNCATT, 'true'));
+	    $kidel = XML::XPath::Node::Element->new("nite:child");
+	    $myid="$fname$wordcount";
+	    $wordcount++;
+	    $wordel->appendAttribute(XML::XPath::Node::Attribute->new($IDATT, "$myid"));
+	    $att = XML::XPath::Node::Attribute->new('href', "$fname\.xml\#id($myid)" );
+	    $kidel->appendAttribute($att);
+	    $segnode->appendChild($kidel);
+	    $wordel->appendChild(XML::XPath::Node::Text->new($punc));	    
+	    $wordstream->appendChild($wordel);
+	}
+	$halfword="";
+	$wordstream->appendChild($tnode);
+	$lastid=$myid;
+
+	if ($endpron==1) {
+	    $pron="";
+	}
+    }
+}	    
+
+
+$outdir=".";
+$indir=".";
+$agent="";
+
+# Get the args
+while (@ARGV) {
+#    print @ARGV;
+    $arg = shift(@ARGV);
+    if ($arg eq "-o") {
+        $outdir = shift(@ARGV);
+        if (!$outdir) { &usage; }
+    } elsif ($arg eq "-a") {
+        $agent = shift(@ARGV);
+        if (!$agent) { &usage; }
+    } elsif ($arg eq "-i") {
+        $indir = shift(@ARGV);
+        if (!$indir) { &usage; }
+    } elsif ($arg eq "-ob") {
+        $obs = shift(@ARGV);
+        if (!$obs) { &usage; }
+    } elsif ($arg eq "-we") {
+        $wordelement = shift(@ARGV);
+        if (!$wordelement) { &usage; }
+    } elsif ($arg eq "-wf") {
+        $wordfile = shift(@ARGV);
+        if (!$wordfile) { &usage; }
+    } elsif ($arg eq "-se") {
+        $segmentelement = shift(@ARGV);
+        if (!$segmentelement) { &usage; }
+    } elsif ($arg eq "-sf") {
+        $segmentfile = shift(@ARGV);
+        if (!$segmentfile) { &usage; }
+    } elsif ($arg =~ /^-/) {
+        &usage;
+    } 
+}
+
+if (!$obs) {
+    &usage;
+}
+
+if (!$agent) {
+    &usage;
+}
+
+
+$fin = "$indir/$obs\.$agent\.segs\.xml";
+if (!(-f $fin)) {
+    die "Segment file $fin does not exist. Exiting.\n";
+}
+
+
+#----------------------------
+print "
+ XML::XPath processing
+";
+#----------------------------
+
+my $xp = XML::XPath->new(filename => $fin);
+
+$root;
+$wordcount=0;
+
+# Segmentation file
+$root = XML::XPath::Node::Element->new("nite:root");
+my $ns = XML::XPath::Node::Attribute->new('xmlns:nite', 'http://nite.sourceforge.net/');
+my $nid = XML::XPath::Node::Attribute->new('nite:id', "$obs\.$agent\.segs");
+$root->appendAttribute($ns);
+$root->appendAttribute($nid);
+
+$tnode = XML::XPath::Node::Text->new("\n");
+$root->appendChild($tnode);
+
+$rootwords = XML::XPath::Node::Element->new("nite:root");
+my $nid = XML::XPath::Node::Attribute->new('nite:id', "$obs\.$agent\.$wordfile");
+$rootwords->appendAttribute($ns);
+$rootwords->appendAttribute($nid);
+$rootwords->appendChild($tnode);
+
+$lastend=0;
+
+foreach my $node ($xp->find('//sync')->get_nodelist){
+    $chan=$node->find('@chan');
+    $id=$node->find('@nite:id');
+    $start=$node->find('@time');
+
+    $text = $node->string_value;
+    $text =~ s/^\s*\n\s*//;
+    $text =~ s/\s*\n\s*$//;
+    if ($curnode) {
+	$att = XML::XPath::Node::Attribute->new('endtime', $start );
+	$curnode->appendAttribute($att);
+	$root->appendChild($curnode);
+	$tnode = XML::XPath::Node::Text->new("\n");
+	$root->appendChild($tnode);
+    }
+    $text =~ s/\`//g;
+    if ($text =~ /^\.\.$/ || $text=~/^\s*$/) { 
+	$curnode="";
+	next; 
+    }
+    #print "Text content: $text\n";
+    
+    $curnode = XML::XPath::Node::Element->new("$segmentelement");
+    $att = XML::XPath::Node::Attribute->new($IDATT, $id );
+    $curnode->appendAttribute($att);
+    $att = XML::XPath::Node::Attribute->new($CHANATT, $chan );
+    $curnode->appendAttribute($att);
+    $att = XML::XPath::Node::Attribute->new($STIMEATT, $start );
+    $curnode->appendAttribute($att);
+
+    # split the text string into words, add them to the wordstream and
+    # add them as nite:child elements of $curnode 
+    handleText($text, $curnode, $rootwords, "$obs\.$agent\.$wordfile");
+    #$root->appendChild($curnode);
+}
+
+$out1="$outdir/$obs.$agent.$wordfile.xml";
+open (OUT, ">$out1");
+print OUT $rootwords->toString;
+close OUT;
+
+$out2="$outdir/$obs.$agent.$segmentfile.xml";
+open (OUT, ">$out2");
+print OUT $root->toString;
+close OUT;
+
