@@ -13,16 +13,14 @@ def crossJoin (list1,list2):
     crossJoined_list.append(list2[i])
   return crossJoined_list
 
-X_train, X_test, y_train, y_test = train_test_split(np.array(X), 
-                                                    np.array(y),
-                                                    test_size=0.5,
-                                                    random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(np.array(X), np.array(y),test_size=0.5,random_state=0)
 
-X_val, X_test, y_val, y_test = train_test_split(X_test, 
-                                                y_test,
-                                                test_size=0.5,
-                                                random_state=0)
+X_val, X_test, y_val, y_test = train_test_split(X_test, y_test,test_size=0.5,random_state=0)
+
 trainloader = crossJoin(X_train, y_train)
+testloader = crossJoin(X_test, y_test)
+
+
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
