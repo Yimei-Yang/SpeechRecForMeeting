@@ -121,7 +121,7 @@ def dialogueActsXMLtoPd(pathToDialogueActs):
   df = df.drop_duplicates(keep='first')
   
   #TODO extract 'meeting_id' from 'Id' variable 
-
+  df['meeting_id'] = df['meeting_id'].str[:6]
   print("Finished converting dialogue acts XML files")
   return df
 
