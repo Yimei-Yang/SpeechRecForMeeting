@@ -1,3 +1,5 @@
+# ! pip install pydub wave regex pathlib librosa contextlib2 pickle-mixin
+
 from pydub import AudioSegment
 import wave
 import contextlib
@@ -11,11 +13,13 @@ import glob, os
 import librosa
 
 
-def getInputSegmentTimes(list_of_timestamps, audio_file, segment_length, overlap_length):
+def getInputSegmentTimes(audio_file, segment_length, overlap_length):
     '''
     get a pd of [id, st_time, ed_time]
     '''
+    list_of_timestamps = []
     # generate meeting name
+  
     meeting_id = audio_file.partition('.interaction.wav')[0]
     print(meeting_id)
 
@@ -28,19 +32,22 @@ def getInputSegmentTimes(list_of_timestamps, audio_file, segment_length, overlap
     l = list(range(int(duration)))
 
     # generate list of timestamps 
-    for i in range(0, len(l), segment_length - overlap_length):
+    for i in range(0, len(l), int(segment_length - overlap_length)):
       list_of_timestamps.append([meeting_id,i,i+segment_length])
 
     df_timestamps = pd.DataFrame(list_of_timestamps, columns=['meeting_id','st_time','ed_time'])
 
     return df_timestamps
 
-def getInputSegments(audio_file, df_timestamps):
+def getInputSegments(audio_file, df_timestamps, rootPath):
     '''
     input: path to audio_file, df_timestamps['meeting_id','st_time','ed_time']
-    output: [path/audio_chunk_{}, ..., path/audio_chunk_{}]
+    output: list of paths to segment file names
     '''
+    print("audio file path {}".format(audio_file))
     audio = AudioSegment.from_wav(audio_file)
+    print("audio file loaded")
+  
     segments=[]
     count = 0
     for idx in df_timestamps.index:
@@ -50,26 +57,33 @@ def getInputSegments(audio_file, df_timestamps):
           break
       start = df_timestamps['st_time'][idx] * 1000
       end = df_timestamps['ed_time'][idx] * 1000 #pydub works in millisec
-      audio_chunk=audio[start:end]
+      audio_segment = audio[start:end]
       count = count + 1
-      segment_name="/content/drive/My Drive/Team 6/segments/{}_{}.wav".format(df_timestamps['meeting_id'][idx], count)
-      audio_chunk.export(segment_name, format="wav")
-      segments.append(segment_name)
+      segment_path = "{}/vivs_segments/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
+      absPath = os.path.abspath(segment_path)
+      print("Ready to export to: {}".format(absPath))
+
+      audio_segment.export(segment_path, format="wav")
+      segments.append(segment_path)
 
     return segments
 
-def getFeatures(output, np_list):
+def getFeatures(segments):
   '''
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
   '''
-  for segment in output:
-    signal,sr = librosa.load(segment,sr=None)
+  print("Number of segments: {}".format(len(segments)))
+  features = []
+  for segment in segments:
+    signal, sr = librosa.load(segment, sr=None)
     if signal is None or len(signal) == 0:
       continue
     else:
       melspect = librosa.feature.melspectrogram(signal)
       #save all np.arrays(.wav) files into an array -> X dataset
-      np_list.append(melspect)
+      features.append(melspect)
+  print("Finished computing features")
+  return features  
 
 def dialogueActsXMLtoPd(pathToDialogueActs):
   '''
@@ -82,11 +96,10 @@ def dialogueActsXMLtoPd(pathToDialogueActs):
     global left
     parsed_xml = et.parse(filename)
     #I hard-coded here but i think it would be easier to modify the panda dataframe later
-    dfcols = ['Id', 'st_time', 'ed_time', 'type', 'adjacency', 'original-type', 'channel', 'participant']
+    dfcols = ['meeting_id', 'st_time', 'ed_time', 'type', 'adjacency', 'original-type', 'channel', 'participant']
     left = pd.DataFrame(columns=dfcols)
 
     root = parsed_xml.getroot()
-    
   
     for diaAct in parsed_xml.findall('./dialogueact'):
       uId = diaAct.get('{http://nite.sourceforge.net/}id')
@@ -106,33 +119,38 @@ def dialogueActsXMLtoPd(pathToDialogueActs):
   df.loc[:, 'st_time'] = pd.to_numeric(df.loc[:, 'st_time'])
   df.loc[:, 'ed_time'] = pd.to_numeric(df.loc[:, 'ed_time'])
   df = df.drop_duplicates(keep='first')
+  
+  #TODO extract 'meeting_id' from 'Id' variable 
 
+  print("Finished converting dialogue acts XML files")
   return df
 
-def addDAoIVariable(df):
-  # Add the 'Interruption' (bool) variable
-  df['DAoI'] = df['type'].str.contains('%-', regex = False)
-  df['DAoI'] = df['Interruption'].astype(bool)
+def addDAoIVariable(df_diag_acts):
+  # Add the 'DAoI' (bool) variable
+  df_diag_acts['DAoI'] = df_diag_acts['type'].str.contains('.*%-', regex = True)
+  df_diag_acts['DAoI'] = df_diag_acts['DAoI'].astype(bool)
 
   # View what types are counted as Interruptions 
-  # print(df.loc[df['Interruption'], 'type'])
-  return df
+  # print(df.loc[df['DAoI'], 'type'])
+  return df_diag_acts
 
-def getLabels(segments, df_interruptions):
+def getLabels(df_timestamps, df_diag_acts):
   '''
-  input: segments: a list of segment file names, df_interruptions['meeting_id','st_time','ed_time', 'daoi']
+  input: df_timestamps[], df_diag_acts['meeting_id','st_time','ed_time']
+  output: boolean vector with the same number of rows as df_timestamps
   '''
-  counts = np.empty(segments.shape[0])
+  counts = np.empty(df_timestamps.shape[0])
 
-  for seg_index, seg_row in segments.iterrows():
-    for inter_index, inter_row in interruptions.iterrows():
-      if seg_row['meeting_id'] != inter_row['meeting_id']:
+  for seg_index, seg_row in df_timestamps.iterrows():
+    for diag_acts_index, diag_acts_row in df_diag_acts.iterrows():
+      if seg_row['meeting_id'] != diag_acts_row['meeting_id']:
         continue
-      elif seg_row['st_time'] < inter_row['st_time'] and seg_row['ed_time'] > inter_row['ed_time']:
+      elif seg_row['st_time'] < diag_acts_row['st_time'] and seg_row['ed_time'] > diag_acts_row['ed_time']:
         counts[seg_index] += 1
       else:
         counts[seg_index] = 0
 
   # label as True if there's at least one entire interruption in the segment
   labels = counts > 0 
+  print("Finished getting labels")
   return labels
