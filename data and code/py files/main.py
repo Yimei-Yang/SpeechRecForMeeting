@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 
-google = True
+google = False
 if google:
     from google.colab import drive
     drive.mount('/content/drive')
@@ -20,8 +20,12 @@ else:
 sys.path.append(rootPath + '/py files')
 from data_preprocessing import *
 
-os.chdir("Signals-test")
-audio_file = 'Bed004.interaction.wav'
+if google:
+    os.chdir("Signals-test")
+else:
+    os.chdir("data and code/Data/Signals")
+
+audio_file = 'Bed001.interaction.wav'
 segment_length = 10 # must be an int
 overlap_length = 1 # must be an int
 print(os.getcwd())
@@ -29,6 +33,8 @@ print(os.getcwd())
 df_timestamps = getInputSegmentTimes(audio_file, segment_length, overlap_length)
 
 segments_paths = getInputSegments(audio_file, df_timestamps, rootPath)
+
+os.chdir(rootPath)
 
 features = getFeatures(segments_paths)
 

@@ -81,7 +81,7 @@ def getFeatures(segments):
       melspect = librosa.feature.melspectrogram(signal)
       #save all np.arrays(.wav) files into an array -> X dataset
       features.append(melspect)
-    return features  
+  return features  
 
 def dialogueActsXMLtoPd(pathToDialogueActs):
   '''
