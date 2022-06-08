@@ -1,4 +1,4 @@
-# ! pip install pydub wave contextlib2 regex pathlib librosa
+# ! pip install pydub wave regex pathlib librosa contextlib2 pickle-mixin
 
 from pydub import AudioSegment
 import wave
@@ -72,15 +72,17 @@ def getFeatures(segments):
   '''
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
   '''
+  print("Number of segments: {}".format(len(segments)))
   features = []
   for segment in segments:
-    signal,sr = librosa.load(segment,sr=None)
+    signal, sr = librosa.load(segment, sr=None)
     if signal is None or len(signal) == 0:
       continue
     else:
       melspect = librosa.feature.melspectrogram(signal)
       #save all np.arrays(.wav) files into an array -> X dataset
       features.append(melspect)
+  print("Finished computing features")
   return features  
 
 def dialogueActsXMLtoPd(pathToDialogueActs):
@@ -94,11 +96,10 @@ def dialogueActsXMLtoPd(pathToDialogueActs):
     global left
     parsed_xml = et.parse(filename)
     #I hard-coded here but i think it would be easier to modify the panda dataframe later
-    dfcols = ['Id', 'st_time', 'ed_time', 'type', 'adjacency', 'original-type', 'channel', 'participant']
+    dfcols = ['meeting_id', 'st_time', 'ed_time', 'type', 'adjacency', 'original-type', 'channel', 'participant']
     left = pd.DataFrame(columns=dfcols)
 
     root = parsed_xml.getroot()
-    
   
     for diaAct in parsed_xml.findall('./dialogueact'):
       uId = diaAct.get('{http://nite.sourceforge.net/}id')
@@ -118,21 +119,24 @@ def dialogueActsXMLtoPd(pathToDialogueActs):
   df.loc[:, 'st_time'] = pd.to_numeric(df.loc[:, 'st_time'])
   df.loc[:, 'ed_time'] = pd.to_numeric(df.loc[:, 'ed_time'])
   df = df.drop_duplicates(keep='first')
+  
+  #TODO extract 'meeting_id' from 'Id' variable 
 
+  print("Finished converting dialogue acts XML files")
   return df
 
 def addDAoIVariable(df_diag_acts):
-  # Add the 'Interruption' (bool) variable
-  df_diag_acts['DAoI'] = df_diag_acts['type'].str.contains('%-', regex = False)
-  df_diag_acts['DAoI'] = df_diag_acts['Interruption'].astype(bool)
+  # Add the 'DAoI' (bool) variable
+  df_diag_acts['DAoI'] = df_diag_acts['type'].str.contains('.*%-', regex = True)
+  df_diag_acts['DAoI'] = df_diag_acts['DAoI'].astype(bool)
 
   # View what types are counted as Interruptions 
-  # print(df.loc[df['Interruption'], 'type'])
+  # print(df.loc[df['DAoI'], 'type'])
   return df_diag_acts
 
 def getLabels(df_timestamps, df_diag_acts):
   '''
-  input: df_timestamps[], df_diag_acts['meeting_id','st_time','ed_time', 'daoi']
+  input: df_timestamps[], df_diag_acts['meeting_id','st_time','ed_time']
   output: boolean vector with the same number of rows as df_timestamps
   '''
   counts = np.empty(df_timestamps.shape[0])
@@ -148,4 +152,5 @@ def getLabels(df_timestamps, df_diag_acts):
 
   # label as True if there's at least one entire interruption in the segment
   labels = counts > 0 
+  print("Finished getting labels")
   return labels
