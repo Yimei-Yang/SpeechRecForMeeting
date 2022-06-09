@@ -21,7 +21,7 @@ def getInputSegmentTimes(audio_file, segment_length, overlap_length):
     # generate meeting name
   
     meeting_id = audio_file.partition('.interaction.wav')[0]
-    print(meeting_id)
+    #print(meeting_id)
 
     # get duration of meeting
     with contextlib.closing(wave.open(audio_file,'r')) as f:
@@ -44,9 +44,7 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
     input: path to audio_file, df_timestamps['meeting_id','st_time','ed_time']
     output: list of paths to segment file names
     '''
-    print("audio file path {}".format(audio_file))
     audio = AudioSegment.from_wav(audio_file)
-    print("audio file loaded")
   
     segments=[]
     count = 0
@@ -56,12 +54,14 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
       if idx == len(df_timestamps.index):
           break
       start = df_timestamps['st_time'][idx] * 1000
-      end = df_timestamps['ed_time'][idx] * 1000 #pydub works in millisec
+      end = df_timestamps['ed_time'][idx] * 1000
+      #print(start, type(start), end, type(end))
       audio_segment = audio[start:end]
+      #print("segmented")
       count = count + 1
-      segment_path = "{}/vivs_segments/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
+      segment_path = "{}/segments-whole/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
       absPath = os.path.abspath(segment_path)
-      print("Ready to export to: {}".format(absPath))
+      #print("Ready to export to: {}".format(absPath))
 
       audio_segment.export(segment_path, format="wav")
       segments.append(segment_path)
@@ -72,7 +72,7 @@ def getFeatures(segments):
   '''
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
   '''
-  print("Number of segments: {}".format(len(segments)))
+  #print("Number of segments: {}".format(len(segments)))
   features = []
   for segment in segments:
     signal, sr = librosa.load(segment, sr=None)
