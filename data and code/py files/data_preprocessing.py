@@ -120,7 +120,6 @@ def dialogueActsXMLtoPd(pathToDialogueActs):
   df.loc[:, 'ed_time'] = pd.to_numeric(df.loc[:, 'ed_time'])
   df = df.drop_duplicates(keep='first')
   
-  #TODO extract 'meeting_id' from 'Id' variable 
   df['meeting_id'] = df['meeting_id'].str[:6]
   print("Finished converting dialogue acts XML files")
   return df
