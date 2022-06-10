@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pickle
+from sklearn.model_selection import train_test_split
 
 from pydub import AudioSegment
 import wave, librosa
@@ -16,10 +17,12 @@ if google:
     os.chdir("/content/drive/My Drive/Team 6")
     rootPath = "/content/drive/My Drive/Team 6"
 else:
-    pass
+    rootPath = ''
 
 sys.path.append(rootPath + '/py files')
 from data_preprocessing import *
+
+# Pre-processing
 
 os.chdir("Signals")
 segment_length = 10 # must be an int
@@ -51,3 +54,14 @@ df_diag_acts = addDAoIVariable(df_diag_acts)
 labels = getLabels(df_timestamps, df_diag_acts)
 with open('./processed-data/labels-whole.pkl', 'wb') as f:
   pickle.dump(labels, f)
+
+# Train and evaluate model
+
+[model, features, labels] = initialize()
+
+x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.25, random_state=0)
+
+model.fit(x_train, y_train)
+
+results = evaluate(model, x_test, y_test)
+
