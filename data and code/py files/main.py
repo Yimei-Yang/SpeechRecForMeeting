@@ -56,12 +56,13 @@ with open('./processed-data/labels-whole.pkl', 'wb') as f:
   pickle.dump(labels, f)
 
 # Train and evaluate model
+from logistic_model import *
 
 [model, features, labels] = initialize()
 
 x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.25, random_state=0)
 
-model.fit(x_train, y_train)
+model = train(model, x_train, y_train)
 
 results = evaluate(model, x_test, y_test)
 
