@@ -16,7 +16,7 @@ if google:
     os.chdir("/content/drive/My Drive/Team 6")
     rootPath = "/content/drive/My Drive/Team 6"
 else:
-    pass
+    rootPath = ''
 
 sys.path.append(rootPath + '/py files')
 from data_preprocessing import *
