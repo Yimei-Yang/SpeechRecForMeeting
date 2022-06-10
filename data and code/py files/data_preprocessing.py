@@ -144,9 +144,10 @@ def getLabels(df_timestamps, df_diag_acts):
   input: df_timestamps[], df_diag_acts['meeting_id','st_time','ed_time']
   output: boolean vector with the same number of rows as df_timestamps
   '''
-  counts = np.empty(df_timestamps.shape[0])
-  df_it = df_diag_acts.loc[df_diag_acts['DAoI'] == 1]
-
+  counts = np.zeros(df_timestamps.shape[0])
+  df_it = df_diag_acts.loc[df_diag_acts['DAoI'] == True]
+  print("whole shape", df_diag_acts.shape[0])
+  print("true shape", df_it.shape[0])
   for seg_index, seg_row in df_timestamps.iterrows():
     for diag_acts_index, diag_acts_row in df_it.iterrows():
       if seg_row['meeting_id'] != diag_acts_row['meeting_id']:
@@ -162,6 +163,16 @@ def getLabels(df_timestamps, df_diag_acts):
       counts[idx] = int(1)
     else:
       counts[idx] = int(0)
+  non = 0
+  yes=0
+  for x in counts:
+    if x == 0:
+      non = non+1
+    else:
+      yes = yes+1
+  print(len(counts))
+  print("non", non, "yes", yes)
   labels = torch.Tensor(counts)
   print("Finished getting labels")
+  print(labels)
   return labels
