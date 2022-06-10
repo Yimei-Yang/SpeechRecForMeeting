@@ -163,16 +163,17 @@ def getLabels(df_timestamps, df_diag_acts):
       counts[idx] = int(1)
     else:
       counts[idx] = int(0)
+  A = [int(counts) for counts in counts]
+  print("type of A", type(A[0]))
   non = 0
   yes=0
-  for x in counts:
+  for x in A:
     if x == 0:
       non = non+1
     else:
       yes = yes+1
-  print(len(counts))
+  print(len(A))
   print("non", non, "yes", yes)
-  labels = torch.Tensor(counts)
   print("Finished getting labels")
-  print(labels)
-  return labels
+  print(A)
+  return A
