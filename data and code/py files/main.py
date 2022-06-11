@@ -57,6 +57,21 @@ with open('./processed-data/labels-whole.pkl', 'wb') as f:
 
 # Train and evaluate model
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
+kwargs = {'num_workers': 1, 'pin_memory': True} if device=='cuda' else {}
+
+train_loader = torch.utils.data.DataLoader(
+  torchvision.datasets.MNIST('/files/', train=True, download=True),
+  batch_size=batch_size_train, **kwargs)
+
+test_loader = torch.utils.data.DataLoader(
+  torchvision.datasets.MNIST('files/', train=False, download=True),
+  batch_size=batch_size, **kwargs)
+
+
+epochs = 100
+learning_rate = 0.01
+
 from logistic_model import *
 
 [model, features] = initialize(features)
