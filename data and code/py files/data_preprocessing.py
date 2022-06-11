@@ -12,6 +12,59 @@ import torch
 import glob, os
 import librosa
 
+def processSegments(signals_folder):
+  '''
+  inputs path (str) to 
+  '''
+  os.chdir(signals_folder)
+  segment_length, overlap_length = 10, 1 # must be an int
+
+  df_timestamps = pd.DataFrame()
+  segments_path = []
+  for audio_file in glob.glob('*.wav'):
+    df_timestamps_t = getInputSegmentTimes(audio_file, segment_length, overlap_length)
+    segments_paths_t = getInputSegments(audio_file, df_timestamps_t, rootPath)
+    df_timestamps = df_timestamps.append(df_timestamps_t)
+    segments_path.append(segments_paths_t)
+
+  os.chdir(rootPath + '/segments-viv')
+  segment_paths = glob.glob("*.wav")
+  segment_full_paths = [rootPath + "/segments-viv/" + s for s in segment_paths]
+
+  print("Number of segments: {}".format(len(segment_full_paths)))
+  print("df_timestamps shape: {}".format(df_timestamps.shape))
+  features = getFeatures(segment_full_paths, df_timestamps)
+  return [features, df_timestamps]
+
+def prepareDataset(features, df_timestamps, labels):
+  os.chdir(rootPath)
+
+  features_path = './processed-data/features-whole.pkl'
+  with open(features_path, 'wb') as f:
+    print("Writing to {}".format(features_path))
+    pickle.dump(features, f)
+
+  labels = getLabels(df_timestamps, df_diag_acts)
+  labels_path = './processed-data/labels-whole.pkl'
+  with open(labels_path, 'wb') as f:
+    print("Writing to {}".format(labels_path))
+    pickle.dump(labels, f)
+  print
+
+def processDialogueActs():
+  df_diag_acts = dialogueActsXMLtoPd(rootPath + '/dialogue-acts/*.xml')
+  df_diag_acts = addDAoIVariable(df_diag_acts)
+  diag_acts_path = './processed-data/dialogue-acts-whole.pkl'
+
+  with open(diag_acts_path, 'wb') as f:
+    print("Writing to {}".format(diag_acts_path))
+    pickle.dump(df_diag_acts, f)
+  return diag_acts_path
+
+  
+
+
+# ------------------------------------------------------------------- #
 
 def getInputSegmentTimes(audio_file, segment_length, overlap_length):
     '''

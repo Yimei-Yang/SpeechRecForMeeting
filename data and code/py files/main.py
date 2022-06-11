@@ -24,61 +24,34 @@ from data_preprocessing import *
 
 # Pre-processing
 
-os.chdir("Signals")
-segment_length = 10 # must be an int
-overlap_length = 1 # must be an int
-#print(os.getcwd())
-df_timestamps = pd.DataFrame()
-segments_path = []
-for audio_file in glob.glob('*.wav'):
-  df_timestamps_t = getInputSegmentTimes(audio_file, segment_length, overlap_length)
-  segments_paths_t = getInputSegments(audio_file, df_timestamps_t, rootPath)
-  df_timestamps = df_timestamps.append(df_timestamps_t)
-  segments_path.append(segments_paths_t)
-
-os.chdir(rootPath + '/segments-whole')
-segment_paths = glob.glob("*.wav")
-segment_full_paths = [rootPath + "/segments-whole/" + s for s in segment_paths]
-
-os.chdir(rootPath)
-features = getFeatures(segment_full_paths)
-with open('./processed-data/features-whole.pkl', 'wb') as f:
-  pickle.dump(features, f)
-
-df_diag_acts = dialogueActsXMLtoPd(rootPath + '/dialogue-acts/*.xml')
-with open('./processed-data/dialogue-acts-whole.pkl', 'wb') as f:
-  pickle.dump(df_diag_acts, f)
-
-df_diag_acts.head()
-df_diag_acts = addDAoIVariable(df_diag_acts)
-labels = getLabels(df_timestamps, df_diag_acts)
-with open('./processed-data/labels-whole.pkl', 'wb') as f:
-  pickle.dump(labels, f)
-
-# Train and evaluate model
-
-device = "cuda" if torch.cuda.is_available() else "cpu"
-kwargs = {'num_workers': 1, 'pin_memory': True} if device=='cuda' else {}
-
-train_loader = torch.utils.data.DataLoader(
-  torchvision.datasets.MNIST('/files/', train=True, download=True),
-  batch_size=batch_size_train, **kwargs)
-
-test_loader = torch.utils.data.DataLoader(
-  torchvision.datasets.MNIST('files/', train=False, download=True),
-  batch_size=batch_size, **kwargs)
+segment_full_paths = processSegments("Signals")
+processFeatures(segments_full_paths)
 
 
-epochs = 100
-learning_rate = 0.01
+# # Train and evaluate model
 
-from logistic_model import *
+# device = "cuda" if torch.cuda.is_available() else "cpu"
+# kwargs = {'num_workers': 1, 'pin_memory': True} if device=='cuda' else {}
 
-[model, features] = initialize(features)
+# train_loader = torch.utils.data.DataLoader(
+#   torchvision.datasets.MNIST('/files/', train=True, download=True),
+#   batch_size=batch_size_train, **kwargs)
 
-x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.25, random_state=0)
+# test_loader = torch.utils.data.DataLoader(
+#   torchvision.datasets.MNIST('files/', train=False, download=True),
+#   batch_size=batch_size, **kwargs)
 
-model = train(model, x_train, y_train)
 
-results = evaluate(model, x_test, y_test)
+# epochs = 100
+# learning_rate = 0.01
+
+# from logistic_model import *
+
+# [model, features] = initialize(features)
+
+# x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.25, random_state=0)
+
+# model = train(model, x_train, y_train)
+
+# results = evaluate(model, x_test, y_test)
 
