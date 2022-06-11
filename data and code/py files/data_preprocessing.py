@@ -8,7 +8,7 @@ import pandas as pd
 import re
 import xml.etree.ElementTree as et
 from pathlib import Path
-
+import torch
 import glob, os
 import librosa
 
@@ -59,7 +59,7 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
       audio_segment = audio[start:end]
       #print("segmented")
       count = count + 1
-      segment_path = "{}/segments-whole/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
+      segment_path = "{}/segments-test/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
       absPath = os.path.abspath(segment_path)
       #print("Ready to export to: {}".format(absPath))
 
@@ -68,22 +68,28 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
 
     return segments
 
-def getFeatures(segments):
+def getFeatures(segments, df_timestamps):
   '''
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
+  change the parameter of the mel spec
+  cut the picture
+  need to change the output to pytorch tensor 
   '''
+
   #print("Number of segments: {}".format(len(segments)))
   features = []
-  for segment in segments:
+  for idx, segment in enumerate(segments):
     signal, sr = librosa.load(segment, sr=None)
     if signal is None or len(signal) == 0:
-      continue
+      df_timestamps = df_timestamps.drop(idx)
     else:
-      melspect = librosa.feature.melspectrogram(signal)
+      melspect = librosa.feature.melspectrogram(signal, n_fft = 512, hop_length = 512/2, win_length = 512)
       #save all np.arrays(.wav) files into an array -> X dataset
       features.append(melspect)
+  features = torch.Tensor(features)
   print("Finished computing features")
-  return features  
+
+  return features
 
 def dialogueActsXMLtoPd(pathToDialogueActs):
   '''
@@ -138,10 +144,12 @@ def getLabels(df_timestamps, df_diag_acts):
   input: df_timestamps[], df_diag_acts['meeting_id','st_time','ed_time']
   output: boolean vector with the same number of rows as df_timestamps
   '''
-  counts = np.empty(df_timestamps.shape[0])
-
+  counts = np.zeros(df_timestamps.shape[0])
+  df_it = df_diag_acts.loc[df_diag_acts['DAoI'] == True]
+  print("whole shape", df_diag_acts.shape[0])
+  print("true shape", df_it.shape[0])
   for seg_index, seg_row in df_timestamps.iterrows():
-    for diag_acts_index, diag_acts_row in df_diag_acts.iterrows():
+    for diag_acts_index, diag_acts_row in df_it.iterrows():
       if seg_row['meeting_id'] != diag_acts_row['meeting_id']:
         continue
       elif seg_row['st_time'] < diag_acts_row['st_time'] and seg_row['ed_time'] > diag_acts_row['ed_time']:
@@ -150,6 +158,22 @@ def getLabels(df_timestamps, df_diag_acts):
         counts[seg_index] = 0
 
   # label as True if there's at least one entire interruption in the segment
-  labels = counts > 0 
+  for idx, num in enumerate(counts):
+    if num>0:
+      counts[idx] = int(1)
+    else:
+      counts[idx] = int(0)
+  A = [int(counts) for counts in counts]
+  print("type of A", type(A[0]))
+  non = 0
+  yes=0
+  for x in A:
+    if x == 0:
+      non = non+1
+    else:
+      yes = yes+1
+  print(len(A))
+  print("non", non, "yes", yes)
   print("Finished getting labels")
-  return labels
+  print(A)
+  return A
