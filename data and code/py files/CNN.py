@@ -1,10 +1,12 @@
 '''all imports goes at top'''
 
 import numpy as np
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+
 import cv2,glob
 import random
 import tensorflow as tf
