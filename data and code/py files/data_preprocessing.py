@@ -71,23 +71,42 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
 def getFeatures(segments, df_timestamps):
   '''
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
-  change the parameter of the mel spec
-  cut the picture
-  need to change the output to pytorch tensor 
   '''
-
   #print("Number of segments: {}".format(len(segments)))
   features = []
+  print(df_timestamps.describe)
+  print("timestamp length", df_timestamps.shape[0])
+  print(df_timestamps.iloc[:, 0])
+  df_timestamps.reset_index(inplace=True)
+  print(df_timestamps.iloc[:, 0])
+  print(df_timestamps.loc[[792]])
+  print("segments length", len(segments))
   for idx, segment in enumerate(segments):
     signal, sr = librosa.load(segment, sr=None)
     if signal is None or len(signal) == 0:
-      df_timestamps = df_timestamps.drop(idx)
+      df_timestamps = df_timestamps.drop([idx])
+    elif idx == (len(segments)-1):
+      df_timestamps = df_timestamps[:-1]
     else:
-      melspect = librosa.feature.melspectrogram(signal, n_fft = 512, hop_length = 512/2, win_length = 512)
+      melspect = librosa.feature.melspectrogram(signal, n_fft = 512, hop_length = 256, win_length = 512)
       #save all np.arrays(.wav) files into an array -> X dataset
-      features.append(melspect)
-  features = torch.Tensor(features)
+      if features and not melspect.shape == features[0].shape :
+        print(df_timestamps.loc[[idx]])
+        df_timestamps = df_timestamps.drop([idx])
+      else:
+        features.append(melspect)
   print("Finished computing features")
+  print("length of the features", len(features))
+  shape = features[0].shape
+  for x in features:
+    if not x.shape==shape:
+      print(x.shape)
+  features = np.stack(features)
+  features = torch.Tensor(features)
+  features = features.reshape(features.shape[0], 1, features.shape[1], features.shape[2])
+  print(features.shape)
+  print(features[0].shape)
+  print(features[0][0].shape)
 
   return features
 
@@ -177,4 +196,6 @@ def getLabels(df_timestamps, df_diag_acts):
   print("non", non, "yes", yes)
   print("Finished getting labels")
   print(A)
+  print("type of lable list is", type(A))
+  print("type of lable is", type(A[0]))
   return A
