@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pickle
+from sklearn.model_selection import train_test_split
 
 from pydub import AudioSegment
 import wave, librosa
@@ -16,10 +17,12 @@ if google:
     os.chdir("/content/drive/My Drive/Team 6")
     rootPath = "/content/drive/My Drive/Team 6"
 else:
-    pass
+    rootPath = ''
 
 #sys.path.append(rootPath + '/py files')
 #from data_preprocessing import *
+
+# Pre-processing
 
 # Pre-processing
 
@@ -67,4 +70,6 @@ x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=
 
 model.fit(x_train, y_train)
 
+
 results = evaluate(model, x_test, y_test)
+
