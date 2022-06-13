@@ -35,9 +35,9 @@ df_timestamps = pd.DataFrame()
 segments_path = []
 for audio_file in glob.glob('*.wav'):
   df_timestamps_t = getInputSegmentTimes(audio_file, segment_length, overlap_length)
-  #segments_paths_t = getInputSegments(audio_file, df_timestamps_t, rootPath)
+  segments_paths_t = getInputSegments(audio_file, df_timestamps_t, rootPath)
   df_timestamps = df_timestamps.append(df_timestamps_t)
-  #segments_path.append(segments_paths_t)
+  segments_path.append(segments_paths_t)
 
 os.chdir(rootPath + '/segments')
 segment_paths = glob.glob("*.wav")
