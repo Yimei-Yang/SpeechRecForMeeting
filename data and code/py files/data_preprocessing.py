@@ -14,6 +14,8 @@ import librosa
 import torch
 from torch.utils.data import Dataset
 
+p = {}
+
 class dataset(Dataset):
 
     def __init__(self, features, df_timestamps, labels, p):
@@ -33,7 +35,7 @@ class dataset(Dataset):
         sample = [0]
         return sample
 
-def prepareDataset(segment_paths, df_timestamps, df_diag_acts, p):
+def prepareDataset(segment_paths, df_timestamps, df_diag_acts):
 
   features, df_timestamps, p = getFeatures(segment_full_paths, df_timestamps, p)
   print("Feature size: {}".format(features.size))
@@ -55,7 +57,8 @@ def processSignals(signals_folder, rootPath):
   '''
   os.chdir(signals_folder)
   segment_length, overlap_length = 10, 1 # must be an int
-  p = {'segment_length': segment_length, 'overlap_length': overlap_length}
+  p['segment_length'] = segment_length
+  p['overlap_length'] = overlap_length
 
   df_timestamps = pd.DataFrame()
   segments_path = []
