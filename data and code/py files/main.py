@@ -24,9 +24,8 @@ from data_preprocessing import *
 
 # Pre-processing
 
-[features, df_timestamps] = processSegments("Signals- 10M")
-processFeatures(segments_full_paths)
-
+# [features, df_timestamps] = processSegments("Signals- 10M")
+# diag_acts_path = processDialogueActs(path2all_xml_files)
 
 
 # # Train and evaluate model

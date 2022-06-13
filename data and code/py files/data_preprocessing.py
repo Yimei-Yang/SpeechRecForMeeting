@@ -13,29 +13,33 @@ import glob, os
 import librosa
 import torch
 
-# class dataset(Dataset):
+class dataset(Dataset):
 
-#     def __init__(self, features, labels):
-#         self.labels = labels
-#         self.features = features
+    def __init__(self, features, df_timestamps, labels):
+        self.labels = labels
+        self.features = features
+        self.df_timestamps = df_timestamps
 
-#     def __len__(self):
-#         return len(self.labels)
+    def __len__(self):
+      if len(self.labels) == feature.size[0]:
+        return len(self.labels)
+      else:
+        print("Feature size doesn't match label length.")
 
-#     def __getitem__(self, idx):
-#         if torch.is_tensor(idx):
-#             idx = idx.tolist()
+    def __getitem__(self, idx):
+        # ask Jingming for help
+        return sample
 
-#         img_name = os.path.join(self.root_dir,
-#                                 self.landmarks_frame.iloc[idx, 0])
-#         image = io.imread(img_name)
-#         landmarks = self.landmarks_frame.iloc[idx, 1:]
-#         landmarks = np.array([landmarks])
-#         landmarks = landmarks.astype('float').reshape(-1, 2)
-#         sample = {'image': image, 'landmarks': landmarks}
+def prepareDataset(features, df_timestamps, df_diag_acts, balance):
 
-#         return sample
+  data = dataset(features, df_timestamps, labels)
 
+  dataset_path = './processed-data/whole-dataset.pkl'
+
+  with open(dataset_path, 'wb') as f:
+    print("Writing to {}".format(dataset_path))
+    pickle.dump(data, f)
+  return dataset_path
 
 def processSegments(signals_folder):
   '''
@@ -77,17 +81,13 @@ def processSegments(signals_folder):
 def processDialogueActs(path2all_xml_files):
   df_diag_acts = dialogueActsXMLtoPd(path2all_xml_files) # rootPath + '/dialogue-acts/*.xml'
   df_diag_acts = addDAoIVariable(df_diag_acts)
-  diag_acts_path = './processed-data/dialogue-acts-whole.pkl'
+  df_diag_acts = df_diag_acts[df_diag_acts.DAoI]
+  diag_acts_path = './processed-data/dialogue-acts-prepped.pkl'
 
   with open(diag_acts_path, 'wb') as f:
     print("Writing to {}".format(diag_acts_path))
     pickle.dump(df_diag_acts, f)
   return diag_acts_path
-
-  
-
-  
-
 
 # ------------------------------------------------------------------- #
 
@@ -210,9 +210,9 @@ def dialogueActsXMLtoPd(pathToDialogueActs):
 
 def addDAoIVariable(df_diag_acts):
   # Add the 'DAoI' (bool) variable
-  df_diag_acts['DAoI'] = df_diag_acts['type'].str.contains('.*%-', regex = True)
+  df_diag_acts['DAoI'] = df_diag_acts['type'].str.fullmatch('.*%-')
   df_diag_acts['DAoI'] = df_diag_acts['DAoI'].astype(bool)
-
+  
   # View what types are counted as Interruptions 
   # print(df.loc[df['DAoI'], 'type'])
   return df_diag_acts
