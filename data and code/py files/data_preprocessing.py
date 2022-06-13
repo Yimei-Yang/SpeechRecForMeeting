@@ -150,6 +150,8 @@ def getFeatures(segment_paths, df_timestamps, p):
   p["nfft"] = 512
   p["hop_length"] = 512/2
   p["win_length"] = 512
+  # p["fmax"] = sr/2
+  p["n_mels"] = 128
 
   #print("Number of segments: {}".format(len(segments)))
   features = []
@@ -168,7 +170,7 @@ def getFeatures(segment_paths, df_timestamps, p):
     elif idx == (len(segments)-1):
       df_timestamps = df_timestamps[:-1]
     else:
-      melspect = librosa.feature.melspectrogram(signal, n_fft = p["nfft"], hop_length = p["hop_length"], win_length = p["win_length"])
+      melspect = librosa.feature.melspectrogram(signal, n_fft = p["nfft"], hop_length = p["hop_length"], win_length = p["win_length"], n_mels = p["n_mels"])
       #save all np.arrays(.wav) files into an array -> X dataset
       if features and not melspect.shape == features[0].shape :
         #print(df_timestamps.loc[[idx]])
