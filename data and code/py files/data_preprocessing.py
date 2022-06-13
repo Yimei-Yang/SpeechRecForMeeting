@@ -16,10 +16,11 @@ from torch.utils.data import Dataset
 
 class dataset(Dataset):
 
-    def __init__(self, features, df_timestamps, labels):
+    def __init__(self, features, df_timestamps, labels, p):
         self.labels = labels
         self.features = features
         self.df_timestamps = df_timestamps
+        self.p = p
 
     def __len__(self):
       if len(self.labels) == feature.size[0]:
