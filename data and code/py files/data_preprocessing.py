@@ -11,6 +11,31 @@ from pathlib import Path
 import torch
 import glob, os
 import librosa
+import torch
+
+# class dataset(Dataset):
+
+#     def __init__(self, features, labels):
+#         self.labels = labels
+#         self.features = features
+
+#     def __len__(self):
+#         return len(self.labels)
+
+#     def __getitem__(self, idx):
+#         if torch.is_tensor(idx):
+#             idx = idx.tolist()
+
+#         img_name = os.path.join(self.root_dir,
+#                                 self.landmarks_frame.iloc[idx, 0])
+#         image = io.imread(img_name)
+#         landmarks = self.landmarks_frame.iloc[idx, 1:]
+#         landmarks = np.array([landmarks])
+#         landmarks = landmarks.astype('float').reshape(-1, 2)
+#         sample = {'image': image, 'landmarks': landmarks}
+
+#         return sample
+
 
 def processSegments(signals_folder):
   '''
@@ -34,25 +59,23 @@ def processSegments(signals_folder):
   print("Number of segments: {}".format(len(segment_full_paths)))
   print("df_timestamps shape: {}".format(df_timestamps.shape))
   features = getFeatures(segment_full_paths, df_timestamps)
-  return [features, df_timestamps]
 
-def prepareDataset(features, df_timestamps, labels):
   os.chdir(rootPath)
 
   features_path = './processed-data/features-whole.pkl'
   with open(features_path, 'wb') as f:
     print("Writing to {}".format(features_path))
     pickle.dump(features, f)
+  return [features, df_timestamps]
 
   labels = getLabels(df_timestamps, df_diag_acts)
   labels_path = './processed-data/labels-whole.pkl'
   with open(labels_path, 'wb') as f:
     print("Writing to {}".format(labels_path))
     pickle.dump(labels, f)
-  print
 
-def processDialogueActs():
-  df_diag_acts = dialogueActsXMLtoPd(rootPath + '/dialogue-acts/*.xml')
+def processDialogueActs(path2all_xml_files):
+  df_diag_acts = dialogueActsXMLtoPd(path2all_xml_files) # rootPath + '/dialogue-acts/*.xml'
   df_diag_acts = addDAoIVariable(df_diag_acts)
   diag_acts_path = './processed-data/dialogue-acts-whole.pkl'
 
@@ -60,6 +83,8 @@ def processDialogueActs():
     print("Writing to {}".format(diag_acts_path))
     pickle.dump(df_diag_acts, f)
   return diag_acts_path
+
+  
 
   
 

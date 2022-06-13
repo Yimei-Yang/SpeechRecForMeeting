@@ -24,8 +24,9 @@ from data_preprocessing import *
 
 # Pre-processing
 
-segment_full_paths = processSegments("Signals")
+[features, df_timestamps] = processSegments("Signals- 10M")
 processFeatures(segments_full_paths)
+
 
 
 # # Train and evaluate model
