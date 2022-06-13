@@ -30,7 +30,21 @@ class dataset(Dataset):
         # ask Jingming for help
         return sample
 
-def prepareDataset(features, df_timestamps, df_diag_acts, balance):
+def prepareDataset(segment_full_paths, df_timestamps, frac_interp):
+
+  features = getFeatures(segment_full_paths, df_timestamps)
+  features_path = './processed-data/features-whole.pkl'
+  
+  with open(features_path, 'wb') as f:
+    print("Writing to {}".format(features_path))
+    pickle.dump(features, f)
+  return [features, df_timestamps]
+
+  labels = getLabels(df_timestamps, df_diag_acts)
+  labels_path = './processed-data/labels-whole.pkl'
+  with open(labels_path, 'wb') as f:
+    print("Writing to {}".format(labels_path))
+    pickle.dump(labels, f)
 
   data = dataset(features, df_timestamps, labels)
 
@@ -41,7 +55,7 @@ def prepareDataset(features, df_timestamps, df_diag_acts, balance):
     pickle.dump(data, f)
   return dataset_path
 
-def processSegments(signals_folder):
+def processSignals(signals_folder):
   '''
   inputs path (str) to 
   '''
@@ -57,26 +71,15 @@ def processSegments(signals_folder):
     segments_path.append(segments_paths_t)
 
   os.chdir(rootPath + '/segments-viv')
-  segment_paths = glob.glob("*.wav")
-  segment_full_paths = [rootPath + "/segments-viv/" + s for s in segment_paths]
+
+  segment_full_paths = [rootPath + "/segments-viv/" + s for s in segments_path]
 
   print("Number of segments: {}".format(len(segment_full_paths)))
   print("df_timestamps shape: {}".format(df_timestamps.shape))
-  features = getFeatures(segment_full_paths, df_timestamps)
 
-  os.chdir(rootPath)
+  return segment_full_paths, df_timestamps
 
-  features_path = './processed-data/features-whole.pkl'
-  with open(features_path, 'wb') as f:
-    print("Writing to {}".format(features_path))
-    pickle.dump(features, f)
-  return [features, df_timestamps]
 
-  labels = getLabels(df_timestamps, df_diag_acts)
-  labels_path = './processed-data/labels-whole.pkl'
-  with open(labels_path, 'wb') as f:
-    print("Writing to {}".format(labels_path))
-    pickle.dump(labels, f)
 
 def processDialogueActs(path2all_xml_files):
   df_diag_acts = dialogueActsXMLtoPd(path2all_xml_files) # rootPath + '/dialogue-acts/*.xml'
@@ -137,7 +140,7 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
       audio_segment = audio[start:end]
       #print("segmented")
       count = count + 1
-      segment_path = "{}/segments-test/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
+      segment_path = "{}/segments-viv/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
       absPath = os.path.abspath(segment_path)
       #print("Ready to export to: {}".format(absPath))
 
