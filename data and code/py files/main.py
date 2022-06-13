@@ -24,8 +24,10 @@ from data_preprocessing import *
 
 # Pre-processing]
 
+
+
 [segment_full_paths, df_timestamps] = processSignals("Signals-10M", rootPath)
-prepareDataset(segment_full_paths, df_timestamps, frac_interp)
+prepareDataset(segment_full_paths, df_timestamps, frac_interp, p)
 
 df_timestamps = getInputSegmentTimes(audio_file, segment_length, overlap_length)
 
@@ -33,30 +35,31 @@ df_timestamps = getInputSegmentTimes(audio_file, segment_length, overlap_length)
 # diag_acts_path = processDialogueActs(path2all_xml_files)
 
 
-# # Train and evaluate model
+# Train and evaluate model
 
-# device = "cuda" if torch.cuda.is_available() else "cpu"
-# kwargs = {'num_workers': 1, 'pin_memory': True} if device=='cuda' else {}
-
-# train_loader = torch.utils.data.DataLoader(
-#   torchvision.datasets.MNIST('/files/', train=True, download=True),
-#   batch_size=batch_size_train, **kwargs)
-
-# test_loader = torch.utils.data.DataLoader(
-#   torchvision.datasets.MNIST('files/', train=False, download=True),
-#   batch_size=batch_size, **kwargs)
+device = "cuda" if torch.cuda.is_available() else "cpu"
+kwargs = {'num_workers': 1, 'pin_memory': True} if device=='cuda' else {}
 
 
-# epochs = 100
-# learning_rate = 0.01
+train_loader = torch.utils.data.DataLoader(
+  torchvision.datasets.MNIST('/files/', train=True, download=True),
+  batch_size=batch_size_train, **kwargs)
 
-# from logistic_model import *
+test_loader = torch.utils.data.DataLoader(
+  torchvision.datasets.MNIST('files/', train=False, download=True),
+  batch_size=batch_size, **kwargs)
 
-# [model, features] = initialize(features)
 
-# x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.25, random_state=0)
+epochs = 100
+learning_rate = 0.01
 
-# model = train(model, x_train, y_train)
+from logistic_model import *
 
-# results = evaluate(model, x_test, y_test)
+[model, features] = initialize(features)
+
+x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.25, random_state=0)
+
+model = train(model, x_train, y_train)
+
+results = evaluate(model, x_test, y_test)
 

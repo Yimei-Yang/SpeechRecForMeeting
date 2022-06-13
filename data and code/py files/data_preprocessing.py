@@ -32,9 +32,9 @@ class dataset(Dataset):
         sample = [0]
         return sample
 
-def prepareDataset(segment_full_paths, df_timestamps, frac_interp):
+def prepareDataset(segment_paths, df_timestamps, df_diag_acts, p):
 
-  features = getFeatures(segment_full_paths, df_timestamps)
+  features, p = getFeatures(segment_full_paths, df_timestamps, p)
   print("Feature size: {}".format(features.size))
   labels = getLabels(df_timestamps, df_diag_acts)
   print("Labels size: {}".format(features.size))
@@ -54,6 +54,7 @@ def processSignals(signals_folder, rootPath):
   '''
   os.chdir(signals_folder)
   segment_length, overlap_length = 10, 1 # must be an int
+  p = [segment_length, overlap_length]
 
   df_timestamps = pd.DataFrame()
   segments_path = []
@@ -67,10 +68,10 @@ def processSignals(signals_folder, rootPath):
 
   # segment_full_paths = [rootPath + "/segments-viv/" + s for s in segments_path]
 
-  print("Number of segments: {}".format(len(segment_full_paths)))
+  print("Number of segments: {}".format(len(segments_path)))
   print("df_timestamps shape: {}".format(df_timestamps.shape))
 
-  return segments_path, df_timestamps
+  return segments_path, df_timestamps, p
 
 def processDialogueActs(path2all_xml_files):
   df_diag_acts = dialogueActsXMLtoPd(path2all_xml_files) # rootPath + '/dialogue-acts/*.xml'
@@ -135,34 +136,38 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
       segment_path = "{}/segments-viv/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
       absPath = os.path.abspath(segment_path)
       #print("Ready to export to: {}".format(absPath))
-# os.makedirs("./segments_viv") (not working, we created the folder manually)
+    # os.makedirs("./segments_viv") (not working, we created the folder manually)
       audio_segment.export(segment_path, format="wav")
       segments.append(segment_path)
 
     return segments
 
-def getFeatures(segments, df_timestamps):
+def getFeatures(segment_paths, df_timestamps, p):
   '''
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
   change the parameter of the mel spec
   cut the picture
   need to change the output to pytorch tensor 
   '''
-
+  nfft = 512
+  hop_length = 512/2
+  win_length = 512
+  p = [p, nfft, hop_length, win_length]
   #print("Number of segments: {}".format(len(segments)))
   features = []
-  for idx, segment in enumerate(segments):
+  for idx, segment in enumerate(segment_paths):
     signal, sr = librosa.load(segment, sr=None)
     if signal is None or len(signal) == 0:
       df_timestamps = df_timestamps.drop(idx)
     else:
-      melspect = librosa.feature.melspectrogram(signal, n_fft = 512, hop_length = 512/2, win_length = 512)
+
+      melspect = librosa.feature.melspectrogram(signal, n_fft = nfft, hop_length = hop_length, win_length = win_length)
       #save all np.arrays(.wav) files into an array -> X dataset
       features.append(melspect)
   features = torch.Tensor(features)
   print("Finished computing features")
 
-  return features
+  return features, p
 
 def dialogueActsXMLtoPd(pathToDialogueActs):
   '''
@@ -217,6 +222,7 @@ def getLabels(df_timestamps, df_diag_acts):
   input: df_timestamps[], df_diag_acts['meeting_id','st_time','ed_time']
   output: boolean vector with the same number of rows as df_timestamps
   '''
+  
   counts = np.zeros(df_timestamps.shape[0])
   df_it = df_diag_acts.loc[df_diag_acts['DAoI'] == True]
   print("whole shape", df_diag_acts.shape[0])
