@@ -21,8 +21,10 @@ if google:
 else:
     rootPath = ''
 
-sys.path.append(rootPath + '/py files')
-from data_preprocessing import *
+#sys.path.append(rootPath + '/py files')
+#from data_preprocessing import *
+
+# Pre-processing
 
 # Pre-processing
 
@@ -73,6 +75,7 @@ for i, (data, label) in enumerate(torch.utils.data.trainLoader):
 
 # # Train and evaluate model
 model = train(model, x_train, y_train)
+
 
 results = evaluate(model, x_test, y_test)
 

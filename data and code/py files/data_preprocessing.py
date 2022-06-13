@@ -145,9 +145,6 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
 def getFeatures(segment_paths, df_timestamps, p):
   '''
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
-  change the parameter of the mel spec
-  cut the picture
-  need to change the output to pytorch tensor 
   '''
   nfft = 512
   hop_length = 512/2
@@ -155,18 +152,45 @@ def getFeatures(segment_paths, df_timestamps, p):
   p = [p, nfft, hop_length, win_length]
   #print("Number of segments: {}".format(len(segments)))
   features = []
-  for idx, segment in enumerate(segment_paths):
+  result = []
+  #print(df_timestamps.describe)
+  #print("timestamp length", df_timestamps.shape[0])
+  #print(df_timestamps.iloc[:, 0])
+  df_timestamps.reset_index(inplace=True)
+  #print(df_timestamps.iloc[:, 0])
+  #print(df_timestamps.loc[[792]])
+  #print("segments length", len(segments))
+  for idx, segment in enumerate(segments):
     signal, sr = librosa.load(segment, sr=None)
     if signal is None or len(signal) == 0:
-      df_timestamps = df_timestamps.drop(idx)
+      df_timestamps = df_timestamps.drop([idx])
+    elif idx == (len(segments)-1):
+      df_timestamps = df_timestamps[:-1]
     else:
       melspect = librosa.feature.melspectrogram(signal, n_fft = nfft, hop_length = hop_length, win_length = win_length)
       #save all np.arrays(.wav) files into an array -> X dataset
-      features.append(melspect)
+      if features and not melspect.shape == features[0].shape :
+        #print(df_timestamps.loc[[idx]])
+        df_timestamps = df_timestamps.drop([idx])
+      else:
+        features.append(melspect)
+  #print("Finished computing features")
+  #print("length of the features", len(features))
+  shape = features[0].shape
+  for x in features:
+    if not x.shape==shape:
+      print(x.shape)
+  features = np.stack(features)
   features = torch.Tensor(features)
-  print("Finished computing features")
-
-  return features, p
+  features = features.reshape(features.shape[0], 1, features.shape[1], features.shape[2])
+  #print(features.shape)
+  #print("length of feature list", features.shape[0])
+  #print(features[0][0].shape)
+  #print("length of timestamps", df_timestamps.shape[0])
+  df_timestamps.reset_index(inplace=True)
+  result.append(features)
+  result.append(df_timestamps)
+  return result
 
 def dialogueActsXMLtoPd(pathToDialogueActs):
   '''
@@ -223,10 +247,13 @@ def getLabels(df_timestamps, df_diag_acts):
   '''
   
   counts = np.zeros(df_timestamps.shape[0])
+  #print("length of df_timestamps", df_timestamps.shape[0])
   df_it = df_diag_acts.loc[df_diag_acts['DAoI'] == True]
-  print("whole shape", df_diag_acts.shape[0])
-  print("true shape", df_it.shape[0])
+  #print("whole shape", df_diag_acts.shape[0])
+  #print("true shape", df_it.shape[0])
+  #print(df_timestamps)
   for seg_index, seg_row in df_timestamps.iterrows():
+    #print("df_timestamps row length", seg_index)
     for diag_acts_index, diag_acts_row in df_it.iterrows():
       if seg_row['meeting_id'] != diag_acts_row['meeting_id']:
         continue
@@ -242,16 +269,18 @@ def getLabels(df_timestamps, df_diag_acts):
     else:
       counts[idx] = int(0)
   A = [int(counts) for counts in counts]
-  print("type of A", type(A[0]))
-  non = 0
-  yes=0
-  for x in A:
-    if x == 0:
-      non = non+1
-    else:
-      yes = yes+1
-  print(len(A))
-  print("non", non, "yes", yes)
-  print("Finished getting labels")
-  print(A)
+  #print("type of A", type(A[0]))
+  #non = 0
+  #yes=0
+  #for x in A:
+    #if x == 0:
+      #non = non+1
+    #else:
+      #yes = yes+1
+  #print(len(A))
+  #print("non", non, "yes", yes)
+  #print("Finished getting labels")
+  #print(A)
+  #print("type of lable list is", type(A))
+  #print("type of lable is", type(A[0]))
   return A
