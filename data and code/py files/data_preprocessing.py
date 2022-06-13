@@ -34,7 +34,7 @@ class dataset(Dataset):
 
 def prepareDataset(segment_paths, df_timestamps, df_diag_acts, p):
 
-  features, p = getFeatures(segment_full_paths, df_timestamps, p)
+  features, df_timestamps, p = getFeatures(segment_full_paths, df_timestamps, p)
   print("Feature size: {}".format(features.size))
   labels = getLabels(df_timestamps, df_diag_acts)
   print("Labels size: {}".format(features.size))
@@ -160,7 +160,6 @@ def getFeatures(segment_paths, df_timestamps, p):
     if signal is None or len(signal) == 0:
       df_timestamps = df_timestamps.drop(idx)
     else:
-
       melspect = librosa.feature.melspectrogram(signal, n_fft = nfft, hop_length = hop_length, win_length = win_length)
       #save all np.arrays(.wav) files into an array -> X dataset
       features.append(melspect)
