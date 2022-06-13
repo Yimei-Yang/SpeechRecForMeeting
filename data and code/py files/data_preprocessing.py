@@ -150,6 +150,7 @@ def getFeatures(segment_paths, df_timestamps, p):
   hop_length = 512/2
   win_length = 512
   p = [p, nfft, hop_length, win_length]
+
   #print("Number of segments: {}".format(len(segments)))
   features = []
   result = []
@@ -190,6 +191,7 @@ def getFeatures(segment_paths, df_timestamps, p):
   df_timestamps.reset_index(inplace=True)
   result.append(features)
   result.append(df_timestamps)
+  result.append(p)
   return result
 
 def dialogueActsXMLtoPd(pathToDialogueActs):
