@@ -22,9 +22,14 @@ else:
 sys.path.append(rootPath + '/py files')
 from data_preprocessing import *
 
-# Pre-processing
+# Pre-processing]
 
-# [features, df_timestamps] = processSegments("Signals- 10M")
+[segment_full_paths, df_timestamps] = processSignals("Signals-10M", rootPath)
+prepareDataset(segment_full_paths, df_timestamps, frac_interp)
+
+df_timestamps = getInputSegmentTimes(audio_file, segment_length, overlap_length)
+
+# [features, df_timestamps] = processSegments("Signals-10M")
 # diag_acts_path = processDialogueActs(path2all_xml_files)
 
 

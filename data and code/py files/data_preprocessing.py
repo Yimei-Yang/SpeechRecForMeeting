@@ -12,6 +12,7 @@ import torch
 import glob, os
 import librosa
 import torch
+from torch.utils.data import Dataset
 
 class dataset(Dataset):
 
@@ -28,23 +29,15 @@ class dataset(Dataset):
 
     def __getitem__(self, idx):
         # ask Jingming for help
+        sample = [0]
         return sample
 
 def prepareDataset(segment_full_paths, df_timestamps, frac_interp):
 
   features = getFeatures(segment_full_paths, df_timestamps)
-  features_path = './processed-data/features-whole.pkl'
-  
-  with open(features_path, 'wb') as f:
-    print("Writing to {}".format(features_path))
-    pickle.dump(features, f)
-  return [features, df_timestamps]
-
+  print("Feature size: {}".format(features.size))
   labels = getLabels(df_timestamps, df_diag_acts)
-  labels_path = './processed-data/labels-whole.pkl'
-  with open(labels_path, 'wb') as f:
-    print("Writing to {}".format(labels_path))
-    pickle.dump(labels, f)
+  print("Labels size: {}".format(features.size))
 
   data = dataset(features, df_timestamps, labels)
 
@@ -55,7 +48,7 @@ def prepareDataset(segment_full_paths, df_timestamps, frac_interp):
     pickle.dump(data, f)
   return dataset_path
 
-def processSignals(signals_folder):
+def processSignals(signals_folder, rootPath):
   '''
   inputs path (str) to 
   '''
@@ -70,16 +63,14 @@ def processSignals(signals_folder):
     df_timestamps = df_timestamps.append(df_timestamps_t)
     segments_path.append(segments_paths_t)
 
-  os.chdir(rootPath + '/segments-viv')
+  os.chdir(rootPath)
 
-  segment_full_paths = [rootPath + "/segments-viv/" + s for s in segments_path]
+  # segment_full_paths = [rootPath + "/segments-viv/" + s for s in segments_path]
 
   print("Number of segments: {}".format(len(segment_full_paths)))
   print("df_timestamps shape: {}".format(df_timestamps.shape))
 
-  return segment_full_paths, df_timestamps
-
-
+  return segments_path, df_timestamps
 
 def processDialogueActs(path2all_xml_files):
   df_diag_acts = dialogueActsXMLtoPd(path2all_xml_files) # rootPath + '/dialogue-acts/*.xml'
@@ -140,10 +131,11 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
       audio_segment = audio[start:end]
       #print("segmented")
       count = count + 1
+      
       segment_path = "{}/segments-viv/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
       absPath = os.path.abspath(segment_path)
       #print("Ready to export to: {}".format(absPath))
-
+# os.makedirs("./segments_viv") (not working, we created the folder manually)
       audio_segment.export(segment_path, format="wav")
       segments.append(segment_path)
 
