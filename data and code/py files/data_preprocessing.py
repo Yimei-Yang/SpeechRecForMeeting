@@ -26,13 +26,13 @@ class dataset(Dataset):
         self.p = p
 
     def __len__(self):
-      if len(self.labels) == len(features):
+      if len(self.labels) == len(self.features):
         return len(self.labels)
       else:
         print("Feature size doesn't match label length.")
 
     def __getitem__(self, idx):
-        sample = [features_list[idx], labels[idx]]
+        sample = [self.features[idx], self.labels[idx]]
         return sample
 
 def prepareDataset(segment_paths, df_timestamps, df_diag_acts):
