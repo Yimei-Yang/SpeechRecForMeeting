@@ -1,4 +1,4 @@
-# ! pip install pydub wave regex pathlib librosa contextlib2 pickle-mixin
+# ! pip install pydub wave regex pathlib librosa contextlib2 pickle-mixin mlflow
 
 from pydub import AudioSegment
 import wave
@@ -14,11 +14,11 @@ import librosa
 import torch
 from torch.utils.data import Dataset
 
-p = {}
+
 
 class dataset(Dataset):
 
-    def __init__(self, features, df_timestamps, labels, p):
+    def __init__(self, features, labels, p = {}, df_timestamps = None):
         self.labels = labels
         self.features = features
         self.df_timestamps = df_timestamps
@@ -31,8 +31,7 @@ class dataset(Dataset):
         print("Feature size doesn't match label length.")
 
     def __getitem__(self, idx):
-        # ask Jingming for help
-        sample = [0]
+        sample = [features_list[idx], labels[idx]]
         return sample
 
 def prepareDataset(segment_paths, df_timestamps, df_diag_acts):
@@ -56,6 +55,7 @@ def processSignals(signals_folder, rootPath):
   inputs path (str) to 
   '''
   os.chdir(signals_folder)
+  p = {}
   segment_length, overlap_length = 10, 1 # must be an int
   p['segment_length'] = segment_length
   p['overlap_length'] = overlap_length
@@ -67,6 +67,7 @@ def processSignals(signals_folder, rootPath):
     segments_paths_t = getInputSegments(audio_file, df_timestamps_t, rootPath)
     df_timestamps = df_timestamps.append(df_timestamps_t)
     segments_path.append(segments_paths_t)
+    print(f"{audio_file} segmented.\n")
 
   os.chdir(rootPath)
 
@@ -248,6 +249,7 @@ def addDAoIVariable(df_diag_acts):
   return df_diag_acts
 
 def getLabels(df_timestamps, df_diag_acts):
+
   '''
   input: df_timestamps[], df_diag_acts['meeting_id','st_time','ed_time']
   output: boolean vector with the same number of rows as df_timestamps
@@ -291,3 +293,15 @@ def getLabels(df_timestamps, df_diag_acts):
   #print("type of lable list is", type(A))
   #print("type of lable is", type(A[0]))
   return A
+
+def crossJoin (list1,list2):
+  crossJoined_list = []
+  
+  for i in range(0,len(list1)):
+    inner_list = []
+    for j in range(0,1):
+      inner_list.append(list1[i])
+      inner_list.append(list2[i])
+    crossJoined_list.append(inner_list)
+
+  return crossJoined_list
