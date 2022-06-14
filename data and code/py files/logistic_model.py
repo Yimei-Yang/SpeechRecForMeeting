@@ -20,7 +20,7 @@ def train(model, x_train, y_train):
     fitted_model = model.fit(x_train, y_train)
     return fitted_model
 
-def evaluate(model, x_test, y_test):
+def evaluate(model, x_test, y_test, y_hat):
     score = logisticRegr.score(x_test, y_test)
     y_hat = model.predict(y_test)
     [fpr, tpr, thresholds] = roc_curve(labels, y_hat)
