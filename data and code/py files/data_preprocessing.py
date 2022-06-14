@@ -11,8 +11,7 @@ from pathlib import Path
 import torch
 import glob, os
 import librosa
-<<<<<<< Updated upstream
-=======
+
 import torch
 from torch.utils.data import Dataset
 
@@ -41,7 +40,6 @@ def prepareDataset(segment_paths, df_timestamps, df_diag_acts, p):
   print("Feature size: {}".format(features.size))
   labels = getLabels(df_timestamps, df_diag_acts)
   print("Labels size: {}".format(features.size))
-
 
   dataset_path = './processed-data/whole-dataset.pkl'
   data_whole = dataset(features, df_timestamps, labels)
@@ -85,16 +83,43 @@ def prepareDataset(segment_paths, df_timestamps, df_diag_acts, p):
   return dataset_path, in_dataset_path, un_dataset_path
 
 
-
 def processSignals(signals_folder, rootPath):
   '''
   inputs path (str) to 
   '''
   os.chdir(signals_folder)
   segment_length, overlap_length = 10, 1 # must be an int
-  p = [segment_length, overlap_length]
->>>>>>> Stashed changes
+  p = {'segment_length': segment_length, 'overlap_length': overlap_length}
 
+  df_timestamps = pd.DataFrame()
+  segments_path = []
+  for audio_file in glob.glob('*.wav'):
+    df_timestamps_t = getInputSegmentTimes(audio_file, segment_length, overlap_length)
+    segments_paths_t = getInputSegments(audio_file, df_timestamps_t, rootPath)
+    df_timestamps = df_timestamps.append(df_timestamps_t)
+    segments_path.append(segments_paths_t)
+
+  os.chdir(rootPath)
+
+  # segment_full_paths = [rootPath + "/segments-viv/" + s for s in segments_path]
+
+  print("Number of segments: {}".format(len(segments_path)))
+  print("df_timestamps shape: {}".format(df_timestamps.shape))
+
+  return segments_path, df_timestamps, p
+
+def processDialogueActs(path2all_xml_files):
+  df_diag_acts = dialogueActsXMLtoPd(path2all_xml_files) # rootPath + '/dialogue-acts/*.xml'
+  df_diag_acts = addDAoIVariable(df_diag_acts)
+  df_diag_acts = df_diag_acts[df_diag_acts.DAoI]
+  diag_acts_path = './processed-data/dialogue-acts-prepped.pkl'
+
+  with open(diag_acts_path, 'wb') as f:
+    print("Writing to {}".format(diag_acts_path))
+    pickle.dump(df_diag_acts, f)
+  return diag_acts_path
+
+# ------------------------------------------------------------------- #
 
 def getInputSegmentTimes(audio_file, segment_length, overlap_length):
     '''
@@ -142,19 +167,26 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
       audio_segment = audio[start:end]
       #print("segmented")
       count = count + 1
-      segment_path = "{}/segments-test/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
+      
+      segment_path = "{}/segments-viv/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
       absPath = os.path.abspath(segment_path)
       #print("Ready to export to: {}".format(absPath))
-
+    # os.makedirs("./segments_viv") (not working, we created the folder manually)
       audio_segment.export(segment_path, format="wav")
       segments.append(segment_path)
 
     return segments
 
-def getFeatures(segments, df_timestamps):
+def getFeatures(segment_paths, df_timestamps, p):
   '''
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
   '''
+  p["nfft"] = 512
+  p["hop_length"] = 512/2
+  p["win_length"] = 512
+  # p["fmax"] = sr/2
+  p["n_mels"] = 128
+
   #print("Number of segments: {}".format(len(segments)))
   features = []
   result = []
@@ -172,7 +204,7 @@ def getFeatures(segments, df_timestamps):
     elif idx == (len(segments)-1):
       df_timestamps = df_timestamps[:-1]
     else:
-      melspect = librosa.feature.melspectrogram(signal, n_fft = 512, hop_length = 256, win_length = 512)
+      melspect = librosa.feature.melspectrogram(signal, n_fft = p["nfft"], hop_length = p["hop_length"], win_length = p["win_length"], n_mels = p["n_mels"])
       #save all np.arrays(.wav) files into an array -> X dataset
       if features and not melspect.shape == features[0].shape :
         #print(df_timestamps.loc[[idx]])
@@ -195,6 +227,7 @@ def getFeatures(segments, df_timestamps):
   df_timestamps.reset_index(inplace=True)
   result.append(features)
   result.append(df_timestamps)
+  result.append(p)
   return result
 
 def dialogueActsXMLtoPd(pathToDialogueActs):
@@ -255,9 +288,9 @@ def selectSample(label_list, df_timestamps, feature_list):
 
 def addDAoIVariable(df_diag_acts):
   # Add the 'DAoI' (bool) variable
-  df_diag_acts['DAoI'] = df_diag_acts['type'].str.contains('.*%-', regex = True)
+  df_diag_acts['DAoI'] = df_diag_acts['type'].str.fullmatch('.*%-')
   df_diag_acts['DAoI'] = df_diag_acts['DAoI'].astype(bool)
-
+  
   # View what types are counted as Interruptions 
   # print(df.loc[df['DAoI'], 'type'])
   return df_diag_acts
@@ -267,6 +300,7 @@ def getLabels(df_timestamps, df_diag_acts):
   input: df_timestamps[], df_diag_acts['meeting_id','st_time','ed_time']
   output: boolean vector with the same number of rows as df_timestamps
   '''
+  
   counts = np.zeros(df_timestamps.shape[0])
   #print("length of df_timestamps", df_timestamps.shape[0])
   df_it = df_diag_acts.loc[df_diag_acts['DAoI'] == True]
