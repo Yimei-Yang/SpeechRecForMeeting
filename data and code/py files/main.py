@@ -69,7 +69,6 @@ datafile.write("Using just the first 10 meetings\n")
 datafile.write("Number of samples: {}\n".format(len(features_list)))
 datafile.write("Shape of a sample: {}\n\n".format(features_list[0].size()))
 
-
 p['num of samples'] = len(features_list)
 p['shape of X'] = features_list[0].size()
 
@@ -86,9 +85,11 @@ p['momentum'] = 0.9
 X_train,X_test,Y_train,Y_test = train_test_split(features_list, labels_list, test_size=p['test_size'], train_size=p['train_size'], random_state=p['seed'], shuffle=True)
 
 X_val, X_test, Y_val, Y_test = train_test_split(X_test, Y_test, test_size=p['test_val_split'], random_state=p['seed'])
+
 train_data = crossJoin(X_train, Y_train)
 val_data = crossJoin(X_val, Y_val)
 test_data = crossJoin(X_test,Y_test)
+
 print("Train/val/test split done\n")
 class CNN(nn.Module):
     def __init__(self):
@@ -147,7 +148,6 @@ def prediction(loader, model):
     losses += loss.data.item()
     
   return losses/len(list(loader)), 1 - correct/total, predictions # we need to normalize loss with respect to the number of batches 
-
 
 with mlflow.start_run(run_name="CNN on 10 meetings"):
     mlflow.log_params(p)
@@ -216,37 +216,9 @@ with mlflow.start_run(run_name="CNN on 10 meetings"):
     mlflow.pytorch.autolog()
     if epoch%1 == 0:
         print('Epoch: {}/{}, Loss: {:.4f}, Error Rate: {:.1f}%'.format(epoch+1, num_epochs, train_loss/n_iter, 100*train_error_rate))
-        
-
-
 
 
 print('Finished Training')
-
-
-
-## Balance dataset
-# count=Counter(y_train)
-# class_count=np.array([count[0],count[1]])
-# weight=1./class_count
-# print(weight)
-
-# samples_weight = np.array([weight[t] for t in y_train])
-# samples_weight = torch.from_numpy(samples_weight)
-
-# sampler = WeightedRandomSampler(samples_weight, len(samples_weight))
-
-# train_loader = torch.utils.data.DataLoader(
-#     torchvision.datasets.MNIST('/files/', train=True, download=True),
-#     batch_size=batch_size_train, **kwargs, sampler = sampler)
-
-# test_loader = torch.utils.data.DataLoader(
-#     torchvision.datasets.MNIST('files/', train=False, download=True),
-#     batch_size=batch_size, **kwargs)
-
-# for i, (data, label) in enumerate(torch.utils.data.trainLoader):
-#     count=Counter(label.np())
-#     print("batch-{}, 0/1: {}/{}".format(i, count[0], count[1]))
 
 # # # Train and evaluate model
 # model = train(model, x_train, y_train)
