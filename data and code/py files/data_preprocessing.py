@@ -11,6 +11,89 @@ from pathlib import Path
 import torch
 import glob, os
 import librosa
+<<<<<<< Updated upstream
+=======
+import torch
+from torch.utils.data import Dataset
+
+class dataset(Dataset):
+
+    def __init__(self, features, df_timestamps, labels, p):
+        self.labels = labels
+        self.features = features
+        self.df_timestamps = df_timestamps
+        self.p = p
+
+    def __len__(self):
+      if len(self.labels) == feature.size[0]:
+        return len(self.labels)
+      else:
+        print("Feature size doesn't match label length.")
+
+    def __getitem__(self, idx):
+        # ask Jingming for help
+        sample = [0]
+        return sample
+
+def prepareDataset(segment_paths, df_timestamps, df_diag_acts, p):
+
+  features, df_timestamps, p = getFeatures(segment_full_paths, df_timestamps, p)
+  print("Feature size: {}".format(features.size))
+  labels = getLabels(df_timestamps, df_diag_acts)
+  print("Labels size: {}".format(features.size))
+
+
+  dataset_path = './processed-data/whole-dataset.pkl'
+  data_whole = dataset(features, df_timestamps, labels)
+  with open(dataset_path, 'wb') as f:
+    print("Writing to {}".format(dataset_path))
+    pickle.dump(data_whole, f)
+  
+
+  feature_list = features.numpy()
+  un_feature = []
+  un_label = []
+  in_feature = []
+  in_label = []
+  interrupted, uniterrupted, df_timestamps = selectSample(labels, df_timestamps, feature_list)
+  df_timestamps_in = df_timestamps[0]
+  df_timestamps_un = df_timestamps[1]
+  for data in uniterrupted:
+    un_feature.append(data[0])
+    un_label.append(data[1])
+  for data in interrupted:
+    in_feature.append(data[0])
+    in_label.append(data[1])
+  un_feature_tensor = torch.Tensor(un_feature)
+  in_feature_tensor = torch.Tensor(in_feature)
+
+  in_dataset_path = '.processed-data/interrupted-dataset.pkl'
+  un_dataset_path = '.processed-data/uninterrupted-dataset.pkl'
+  with open(dataset_path, 'wb') as f:
+    print("Writing to {}".format(dataset_path))
+    pickle.dump(data, f)
+
+
+  data_in  = dataset(un_feature_tensor, df_timestamps_in, in_label)
+  with open(in_dataset_path, 'wb') as f:
+    print("Writing to {}".format(in_dataset_path))
+    pickle.dump(data_in, f)
+  data_un = dataset(in_feature_tensor,df_timestamps_un, un_label)
+  with open(un_dataset_path, 'wb') as f:
+    print("Writing to {}".format(un_dataset_path))
+    pickle.dump(data_un, f)
+  return dataset_path, in_dataset_path, un_dataset_path
+
+
+
+def processSignals(signals_folder, rootPath):
+  '''
+  inputs path (str) to 
+  '''
+  os.chdir(signals_folder)
+  segment_length, overlap_length = 10, 1 # must be an int
+  p = [segment_length, overlap_length]
+>>>>>>> Stashed changes
 
 
 def getInputSegmentTimes(audio_file, segment_length, overlap_length):
@@ -153,6 +236,23 @@ def dialogueActsXMLtoPd(pathToDialogueActs):
   print("Finished converting dialogue acts XML files")
   return df
 
+def selectSample(label_list, df_timestamps, feature_list):
+  interrupted_list = []
+  uninterrupted_list = []
+  timestamps_list = []
+  df_timestamps_in = pd.DataFrame()
+  df_timestamps_un = pd.DataFrame()
+  for idx, label in enumerate(label_list):
+    if label == 1:
+      interrupted_list.append((feature_list[idx],1))
+      df_timestamps_in.append(df_timestamps.loc[idx])
+    else:
+      uninterrupted_list.append((feature_list[idx],0))
+      df_timestamps_un.append(df_timestamps.loc[idx])
+  timestamps_list.append(df_timestamps_in)
+  timestamps_list.append(df_timestamps_un)
+  return interrupted_list, uninterrupted_list
+
 def addDAoIVariable(df_diag_acts):
   # Add the 'DAoI' (bool) variable
   df_diag_acts['DAoI'] = df_diag_acts['type'].str.contains('.*%-', regex = True)
@@ -205,3 +305,5 @@ def getLabels(df_timestamps, df_diag_acts):
   #print("type of lable list is", type(A))
   #print("type of lable is", type(A[0]))
   return A
+
+  
