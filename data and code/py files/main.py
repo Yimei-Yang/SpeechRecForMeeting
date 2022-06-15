@@ -10,6 +10,17 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import WeightedRandomSampler
 from collections import Counter
 
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+import cv2
+import random
+from sklearn.model_selection import train_test_split
+
+import mlflow
+from getpass import getpass
+
 from pydub import AudioSegment
 import wave, librosa
 print(f"Running in {os.getcwd()}")
@@ -25,6 +36,7 @@ if google:
 else:
     rootPath = '/speechRecForMeeting'
     dataPath = ''
+
 print(f"path to py files:{rootPath + '/data and code/py files'}")
 sys.path.append(rootPath + '/py files')
 import data_preprocessing 
@@ -33,6 +45,17 @@ if prepareDataset:
     print("Our scripts imported\n")
 else:
     print("Not importing")
+    rootPath = './data and code'
+
+# # DagsHub set-up --------------------------------
+# os.environ['MLFLOW_TRACKING_USERNAME'] = input('Enter your DAGsHub username: ')
+# os.environ['MLFLOW_TRACKING_PASSWORD'] = getpass('Enter your DAGsHub access token: ')
+# os.environ['MLFLOW_TRACKING_PROJECTNAME'] = input('Enter your DAGsHub project name: ') #speechRecForMeeting
+
+# mlflow.set_tracking_uri(f'https://dagshub.com/Viv-Crowe/speechRecForMeeting.mlflow')
+
+sys.path.append(rootPath + '/py files')
+from data_preprocessing import *
 
 # Pre-processing
 
@@ -65,23 +88,29 @@ prepareDataset(segment_paths, df_diag_acts, p)
 #     samples_weight = np.array([weight[t] for t in y_train])
 #     samples_weight = torch.from_numpy(samples_weight)
 
-#     sampler = WeightedRandomSampler(samples_weight, len(samples_weight))
+    # train_error_rate = 1 - correct/total
+    # mlflow.log_metric("train_error", train_error_rate)
 
-# train_loader = torch.utils.data.DataLoader(
-#     torchvision.datasets.MNIST('/files/', train=True, download=True),
-#     batch_size=batch_size_train, **kwargs, sampler = sampler)
+    # with torch.no_grad():
+    #     test_loss, test_error_rate, _ = prediction(val_dataloader, CNN)
 
-# test_loader = torch.utils.data.DataLoader(
-#     torchvision.datasets.MNIST('files/', train=False, download=True),
-#     batch_size=batch_size, **kwargs)
+    # mlflow.log_metric("test_loss", test_loss)
+    # mlflow.log_metric("test_error_rate", test_error_rate)
 
-# for i, (data, label) in enumerate(torch.utils.data.trainLoader):
-#     count=Counter(label.np())
-#     print("batch-{}, 0/1: {}/{}".format(i, count[0], count[1]))
+    # train_error_rates.append(train_error_rate)
+    # test_error_rates.append(test_error_rate)
+    # train_losses.append(train_loss/n_iter)
+    # test_losses.append(test_loss)
+    # mlflow.pytorch.autolog()
+    # if epoch%1 == 0:
+    #     print('Epoch: {}/{}, Loss: {:.4f}, Error Rate: {:.1f}%'.format(epoch+1, num_epochs, train_loss/n_iter, 100*train_error_rate))
+
+
+print('Finished Training')
 
 # # # Train and evaluate model
 # model = train(model, x_train, y_train)
 
-
 # results = evaluate(model, x_test, y_test)
 
+f.close()
