@@ -53,7 +53,7 @@ from data_preprocessing import *
 # [segment_full_paths, df_timestamps] = processSignals("Signals-10M", rootPath)
 
 p = {'segment_length': 10, 'overlap_length': 1}
-segment_paths = glob.glob('./segments/*.wav')
+segment_paths = glob.glob('./segments/1/*.wav')[0:7000]
 
 with open('./processed-data/dialogue-acts-prepped.pkl', "rb") as f:
     df_diag_acts = pickle.load(f)
@@ -63,7 +63,7 @@ with open('processed-data/df_timestamps.pkl', "rb") as f:
     df_timestamps = pickle.load(f)
 print("Precomputed dataframes loaded.")
 
-dataset_path = prepareDataset(segment_paths, df_diag_acts.loc, df_timestamps, p)
+dataset_path = prepareDataset(segment_paths, df_diag_acts, df_timestamps, p)
 
 
 # device = "cuda" if torch.cuda.is_available() else "cpu"

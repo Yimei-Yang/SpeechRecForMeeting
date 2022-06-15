@@ -45,7 +45,7 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p):
   labels = getLabels(df_timestamps, df_diag_acts)
   print("Labels size: {}".format(len(labels)))
 
-  dataset_path = './processed-data/dataset-whole.pkl'
+  dataset_path = './processed-data/dataset-1.pkl'
   ds = dataset(features, labels, p=p, df_timestamps=df_timestamps)
 
   print(f"Number of labels: {len(labels)}")
@@ -228,13 +228,15 @@ def getFeatures(segment_paths, df_timestamps, p):
       print(f"Computed feature for segment {segment}")
       
   #print("length of the features", len(features))
-  shape = features[0].shape
-  print(f"Shape of one feature: {shape}")
+  if len(features) > 0:
+    shape = features[0].size()
+    print(f"Shape of one feature: {shape}")
+  else: print("No features in list")
 
   for idx,x in enumerate(features):
-    if not x.shape==shape:
+    if not x.size()==shape:
       df_timestamps = df_timestamps.drop([idx])
-      print(f"Incorrect feature shape found: {x.shape}")
+      print(f"Incorrect feature shape found: {x.size()}")
   print(f"ds.features is a {type(features)}")
   print(f"ds has {len(features)} features")
   # features = np.stack(features)
@@ -322,18 +324,24 @@ def getLabels(df_timestamps, df_diag_acts):
   print("-----------------------------------")
   print("Getting labels")
   print("-----------------------------------")
-  labels = np.zeros(df_timestamps.shape[0])
+  counts = np.zeros(df_timestamps.shape[0])
   for diag_acts_index, diag_acts_row in df_diag_acts.iterrows():
     #print("df_timestamps row length", seg_index)
     for seg_index, seg_row in df_timestamps.iterrows():
       if seg_row['meeting_id'] != diag_acts_row['meeting_id']:
         continue
       elif seg_row['st_time'] < diag_acts_row['st_time'] and seg_row['ed_time'] > diag_acts_row['ed_time']:
-        if labels[seg_index] == 0: 
-          print(f"Found segment for iterruption {diag_acts_index}: {seg_index}")
-          labels[seg_index] = 1
+        counts[seg_index] += 1
+        print(f"Found segment for iterruption {diag_acts_index}: {seg_index}")
+        counts[seg_index] = 1
       else: None
 
+  
+  labels = np.empty(len(counts))
+  for idx in range(len(counts)):
+    if counts[idx] == 0:
+      labels[idx] = 0
+    else: labels[idx] = 1
   return labels
 
 def crossJoin (list1,list2):
