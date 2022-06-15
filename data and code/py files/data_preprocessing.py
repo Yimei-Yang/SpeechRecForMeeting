@@ -35,53 +35,59 @@ class dataset(Dataset):
         sample = [self.features[idx], self.labels[idx]]
         return sample
 
-def prepareDataset(segment_paths, df_timestamps, df_diag_acts):
+def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p):
 
-  features, df_timestamps, p = getFeatures(segment_full_paths, df_timestamps, p)
+  features, df_timestamps, p = getFeatures(segment_paths, df_timestamps, p)
   print("Feature size: {}".format(features.size))
   labels = getLabels(df_timestamps, df_diag_acts)
   print("Labels size: {}".format(features.size))
 
   dataset_path = './processed-data/whole-dataset.pkl'
-  data_whole = dataset(features, df_timestamps, labels)
-  with open(dataset_path, 'wb') as f:
-    print("Writing to {}".format(dataset_path))
-    pickle.dump(data_whole, f)
+  data_5 = dataset(features, df_timestamps, labels)
+  print(f"Number of obs: {len(features)}")
+  print(f"Type of features: {type(features)}")
+  print(f"Shape of features: {features[3].size}")
+  print(f"Number of labels: {len(labels)}")
+  print(f"Type of features: {type(labels)}")
+
+  # with open(dataset_path, 'wb') as f:
+  #   print("Writing to {}".format(dataset_path))
+  #   pickle.dump(data_whole, f)
   
 
-  feature_list = features.numpy()
-  un_feature = []
-  un_label = []
-  in_feature = []
-  in_label = []
-  interrupted, uniterrupted, df_timestamps = selectSample(labels, df_timestamps, feature_list)
-  df_timestamps_in = df_timestamps[0]
-  df_timestamps_un = df_timestamps[1]
-  for data in uniterrupted:
-    un_feature.append(data[0])
-    un_label.append(data[1])
-  for data in interrupted:
-    in_feature.append(data[0])
-    in_label.append(data[1])
-  un_feature_tensor = torch.Tensor(un_feature)
-  in_feature_tensor = torch.Tensor(in_feature)
+  # feature_list = features.numpy()
+  # un_feature = []
+  # un_label = []
+  # in_feature = []
+  # in_label = []
+  # interrupted, uniterrupted, df_timestamps = selectSample(labels, df_timestamps, feature_list)
+  # df_timestamps_in = df_timestamps[0]
+  # df_timestamps_un = df_timestamps[1]
+  # for data in uniterrupted:
+  #   un_feature.append(data[0])
+  #   un_label.append(data[1])
+  # for data in interrupted:
+  #   in_feature.append(data[0])
+  #   in_label.append(data[1])
+  # un_feature_tensor = torch.Tensor(un_feature)
+  # in_feature_tensor = torch.Tensor(in_feature)
 
-  in_dataset_path = '.processed-data/interrupted-dataset.pkl'
-  un_dataset_path = '.processed-data/uninterrupted-dataset.pkl'
-  with open(dataset_path, 'wb') as f:
-    print("Writing to {}".format(dataset_path))
-    pickle.dump(data, f)
+  # in_dataset_path = '.processed-data/interrupted-dataset.pkl'
+  # un_dataset_path = '.processed-data/uninterrupted-dataset.pkl'
+  # with open(dataset_path, 'wb') as f:
+  #   print("Writing to {}".format(dataset_path))
+  #   pickle.dump(data, f)
 
 
-  data_in  = dataset(un_feature_tensor, df_timestamps_in, in_label)
-  with open(in_dataset_path, 'wb') as f:
-    print("Writing to {}".format(in_dataset_path))
-    pickle.dump(data_in, f)
-  data_un = dataset(in_feature_tensor,df_timestamps_un, un_label)
-  with open(un_dataset_path, 'wb') as f:
-    print("Writing to {}".format(un_dataset_path))
-    pickle.dump(data_un, f)
-  return dataset_path, in_dataset_path, un_dataset_path
+  # data_in  = dataset(un_feature_tensor, df_timestamps_in, in_label)
+  # with open(in_dataset_path, 'wb') as f:
+  #   print("Writing to {}".format(in_dataset_path))
+  #   pickle.dump(data_in, f)
+  # data_un = dataset(in_feature_tensor,df_timestamps_un, un_label)
+  # with open(un_dataset_path, 'wb') as f:
+  #   print("Writing to {}".format(un_dataset_path))
+  #   pickle.dump(data_un, f)
+  # return dataset_path, in_dataset_path, un_dataset_path
 
 def processSignals(signals_folder, rootPath):
   '''
@@ -101,10 +107,11 @@ def processSignals(signals_folder, rootPath):
     df_timestamps = df_timestamps.append(df_timestamps_t)
     segments_path.append(segments_paths_t)
     print(f"{audio_file} segmented.\n")
+  
+  with open('processed-data/df_timestamps.pkl', "wb") as f:
+    pickle.dump(df_timestamps, f)
 
   os.chdir(rootPath)
-
-  # segment_full_paths = [rootPath + "/segments-viv/" + s for s in segments_path]
 
   print("Number of segments: {}".format(len(segments_path)))
   print("df_timestamps shape: {}".format(df_timestamps.shape))
@@ -185,14 +192,13 @@ def getFeatures(segment_paths, df_timestamps, p):
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
   '''
   p["nfft"] = 512
-  p["hop_length"] = 512/2
+  p["hop_length"] = int(512/2)
   p["win_length"] = 512
   # p["fmax"] = sr/2
   p["n_mels"] = 128
 
   #print("Number of segments: {}".format(len(segments)))
   features = []
-  result = []
   #print(df_timestamps.describe)
   #print("timestamp length", df_timestamps.shape[0])
   #print(df_timestamps.iloc[:, 0])
@@ -200,11 +206,13 @@ def getFeatures(segment_paths, df_timestamps, p):
   #print(df_timestamps.iloc[:, 0])
   #print(df_timestamps.loc[[792]])
   #print("segments length", len(segments))
-  for idx, segment in enumerate(segments):
+  for idx, segment in enumerate(segment_paths):
+
     signal, sr = librosa.load(segment, sr=None)
+
     if signal is None or len(signal) == 0:
       df_timestamps = df_timestamps.drop([idx])
-    elif idx == (len(segments)-1):
+    elif idx == (len(segment_paths)-1):
       df_timestamps = df_timestamps[:-1]
     else:
       melspect = librosa.feature.melspectrogram(signal, n_fft = p["nfft"], hop_length = p["hop_length"], win_length = p["win_length"], n_mels = p["n_mels"])
@@ -228,10 +236,8 @@ def getFeatures(segment_paths, df_timestamps, p):
   #print(features[0][0].shape)
   #print("length of timestamps", df_timestamps.shape[0])
   df_timestamps.reset_index(inplace=True)
-  result.append(features)
-  result.append(df_timestamps)
-  result.append(p)
-  return result
+
+  return features, df_timestamps, p
 
 def dialogueActsXMLtoPd(pathToDialogueActs):
   '''
