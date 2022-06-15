@@ -41,13 +41,14 @@ class CNN(nn.Module):
         x = self.fc3(x)
         return x
 
-def prediction(loader, model):
+def prediction(loader, model, criterion):
 
   correct = 0
   total = 0
   losses = 0
 
   for i, (images, labels) in enumerate(loader):
+    use_gpu = True
     if use_gpu:
       # switch tensor type to GPU
       images = images.cuda()
@@ -55,10 +56,12 @@ def prediction(loader, model):
        
     #print(image.shape, 'test')
     outputs = model(images)
+    predictions = outputs[:,1].clone()
+    print('output size: ', predictions.size())
     
     loss = criterion(outputs, labels)
-  
-    _, predictions = torch.max(outputs, 1)
+
+    # _, predictions = torch.max(outputs, 1)
   
     correct += torch.sum(labels == predictions).item()
     total += labels.shape[0]
@@ -74,6 +77,7 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
   train_error_rates = []
   test_error_rates = []
 
+  use_gpu = True
   if use_gpu:
     # switch model to GPU
     CNN.cuda()
@@ -113,9 +117,8 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
     train_error_rate = 1 - correct/total
 
     with torch.no_grad():
-      test_loss, test_error_rate = prediction(val_dataloader, CNN)
-      mlflow.log_metric("test_loss", test_loss)
-      mlflow.log_metric("train_error", test_error_rate)
+      test_loss, test_error_rate = prediction(val_dataloader, CNN, criterion)
+      m = {"test_loss": test_loss, "train_error": test_error_rate}
 
     train_error_rates.append(train_error_rate)
     test_error_rates.append(test_error_rate)
@@ -126,7 +129,7 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
       print('Epoch: {}/{}, Loss: {:.4f}, Error Rate: {:.1f}%'.format(epoch+1, num_epochs, train_loss/n_iter, 100*train_error_rate))
   
   print('Finished Training')
-  return #list of y_true and y_hat
+  return m #list of y_true and y_hat
 
 def evaluate(y_true, y_hat):
   y_hat_class = [1 if x >= 0.5 else 0 for x in y_hat]  # convert probability to class for classification report

@@ -23,7 +23,7 @@ from getpass import getpass
 from pydub import AudioSegment
 import wave, librosa
 
-google = False
+google = True
 if google:
     from google.colab import drive
     drive.mount('/content/drive')
@@ -33,9 +33,9 @@ else:
     rootPath = './data and code'
 
 # # DagsHub set-up --------------------------------
-# os.environ['MLFLOW_TRACKING_USERNAME'] = input('Enter your DAGsHub username: ')
-# os.environ['MLFLOW_TRACKING_PASSWORD'] = getpass('Enter your DAGsHub access token: ')
-# os.environ['MLFLOW_TRACKING_PROJECTNAME'] = input('Enter your DAGsHub project name: ') #speechRecForMeeting
+os.environ['MLFLOW_TRACKING_USERNAME'] = 'team-token'
+os.environ['MLFLOW_TRACKING_PASSWORD'] = 'f01653d37636d9488c48cd922f6ab83881d2cf4a'
+os.environ['MLFLOW_TRACKING_PROJECTNAME'] = 'speechRecForMeeting' #speechRecForMeeting
 
 mlflow.set_tracking_uri(f'https://dagshub.com/Viv-Crowe/speechRecForMeeting.mlflow')
 
@@ -55,20 +55,22 @@ from CNN import *
 ## Load dataset ##
 DATA_PATH = rootPath + "/processed-data"
 pickle_file = DATA_PATH + "/dataset-10M.pkl"
-train_dataloader, val_dataloader, test_dataloader = prepareData(pickle_data)
+train_dataloader, val_dataloader, test_dataloader, p = prepareData(pickle_file)
 
 ## Train dataset ##
 CNN = initialize()
 criterion = nn.CrossEntropyLoss()
+p['lr'] = 0.01
+p['momentum'] = 0.9
 optimizer = optim.SGD(CNN.parameters(), lr=p['lr'], momentum=p['momentum'])
 with mlflow.start_run(run_name="CNN on 10 meetings"):
     use_gpu = torch.cuda.is_available()
-    train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epochs=5)
+    m = train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epochs=5)
     
     # Log parameters + metrics
     mlflow.log_params(p)
-    mlflow.log_param(CNN.parameters())
-    # mlflow.log_metric("train_error", 'test_value')
+    mlflow.log_param('CNN parameters',CNN.parameters())
+    mlflow.log_metrics(m)
     
 ## Evaluate model ##
 # results = evaluate(model, x_test, y_test)
