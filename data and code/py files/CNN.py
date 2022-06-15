@@ -123,7 +123,10 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
     test_error_rates.append(test_error_rate)
     train_losses.append(train_loss/n_iter)
     test_losses.append(test_loss)
-    m = {"test_loss": test_losses, "train_error": train_error_rates, "test_error": test_error_rates}
+    m = {}
+    # m["test_loss"] = test_losses
+    # m["train_error"] = train_error_rates
+    # m["test_error"] = test_error_rates
 
     if epoch%1 == 0:
       print('Epoch: {}/{}, Loss: {:.4f}, Error Rate: {:.1f}%'.format(epoch+1, num_epochs, train_loss/n_iter, 100*train_error_rate))

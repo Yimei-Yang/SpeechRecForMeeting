@@ -72,6 +72,9 @@ with mlflow.start_run(run_name="CNN on 10 meetings"):
     mlflow.log_params(p)
     mlflow.log_param('CNN parameters',CNN.parameters())
     mlflow.log_metrics(m)
+    # for i in epoch:
+    #   mlflow.log_metrics(test_error, step=i)
+
     
 ## Evaluate model ##
 # results = evaluate(model, x_test, y_test)
