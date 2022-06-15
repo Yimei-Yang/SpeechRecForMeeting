@@ -39,13 +39,12 @@ else:
 
 print(f"path to py files:{rootPath + '/data and code/py files'}")
 sys.path.append(rootPath + '/py files')
-import data_preprocessing 
+from data_preprocessing import *
 # import logistic_model
-if prepareDataset:
+if getInputSegments:
     print("Our scripts imported\n")
 else:
     print("Not importing")
-    rootPath = './data and code'
 
 # # DagsHub set-up --------------------------------
 # os.environ['MLFLOW_TRACKING_USERNAME'] = input('Enter your DAGsHub username: ')
@@ -54,18 +53,19 @@ else:
 
 # mlflow.set_tracking_uri(f'https://dagshub.com/Viv-Crowe/speechRecForMeeting.mlflow')
 
-sys.path.append(rootPath + '/py files')
+sys.path.append(rootPath + '/data and code/py files')
 from data_preprocessing import *
 
 # Pre-processing
 
 # [segment_full_paths, df_timestamps] = processSignals("Signals-10M", rootPath)
-# segment_paths = glob.glob('./segments-5/*.wav')
-# with open('./processed-data/dialogue-acts-prepped.pkl', "rb") as f:
-#     df_diag_acts = pickle.load(f)
-# p = {'segment_length': 10, 'overlap_length': 1}
 
-prepareDataset(segment_paths, df_diag_acts, p)
+segment_paths = glob.glob('./segments-5/*.wav')
+with open('./processed-data/dialogue-acts-prepped.pkl', "rb") as f:
+    df_diag_acts = pickle.load(f)
+p = {'segment_length': 10, 'overlap_length': 1}
+
+# prepareDataset(segment_paths, df_diag_acts, p)
 
 # [features, df_timestamps] = processSegments("Signals-10M")
 # diag_acts_path = processDialogueActs(path2all_xml_files)
@@ -113,4 +113,4 @@ print('Finished Training')
 
 # results = evaluate(model, x_test, y_test)
 
-f.close()
+# f.close()
