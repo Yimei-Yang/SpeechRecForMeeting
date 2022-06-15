@@ -34,8 +34,8 @@ def prepareData(pickle_file):
     features_list = data.features
     labels_list = data.labels
 
-    X_train, X_test, Y_train, Y_test = train_test_split(features_list, labels_list, test_size=0.3, train_size=0.7, random_state=1, shuffle=True)
-    X_val, X_test, Y_val, Y_test = train_test_split(X_test, Y_test, test_size=0.5, random_state=1)
+    X_train, X_test, Y_train, Y_test = train_test_split(features_list, labels_list, test_size=0.3, train_size=0.7, random_state=1, shuffle=True, stratify = labels_list)
+    X_val, X_test, Y_val, Y_test = train_test_split(X_test, Y_test, test_size=0.5, random_state=1, stratify = Y_test)
 
     train_data = crossJoin(X_train, Y_train)
     val_data = crossJoin(X_val, Y_val)
@@ -78,14 +78,15 @@ def prepareData(pickle_file):
 
 def examineBatches(train_dataloader, val_dataloader, test_dataloader):
     # Examine batch distribution
+    print("------------------------------")
     for i, (data, label) in enumerate(train_dataloader):
         count=Counter(label.numpy())
-        print("test-batch-{}, 0/1: {}/{}".format(i, count[0], count[1]))
-
+        print("train-batch-{}, 0/1: {}/{}".format(i, count[0], count[1]))
+    print("------------------------------")
     for i, (data, label) in enumerate(val_dataloader):
         count=Counter(label.numpy())
         print("val-batch-{}, 0/1: {}/{}".format(i, count[0], count[1]))
-    
+    print("------------------------------")
     for i, (data, label) in enumerate(test_dataloader):
         count=Counter(label.numpy())
         print("test-batch-{}, 0/1: {}/{}".format(i, count[0], count[1]))

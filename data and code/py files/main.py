@@ -56,6 +56,7 @@ from CNN import *
 DATA_PATH = rootPath + "/processed-data"
 pickle_file = DATA_PATH + "/dataset-10M.pkl"
 train_dataloader, val_dataloader, test_dataloader, p = prepareData(pickle_file)
+examineBatches(train_dataloader, val_dataloader, test_dataloader)
 
 ## Train dataset ##
 CNN = initialize()

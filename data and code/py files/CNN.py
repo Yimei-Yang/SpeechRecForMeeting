@@ -57,7 +57,7 @@ def prediction(loader, model, criterion):
     #print(image.shape, 'test')
     outputs = model(images)
     predictions = outputs[:,1].clone()
-    print('output size: ', predictions.size())
+    #print('output size: ', predictions.size())
     
     loss = criterion(outputs, labels)
 
@@ -118,12 +118,12 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
 
     with torch.no_grad():
       test_loss, test_error_rate = prediction(val_dataloader, CNN, criterion)
-      m = {"test_loss": test_loss, "train_error": test_error_rate}
 
     train_error_rates.append(train_error_rate)
     test_error_rates.append(test_error_rate)
     train_losses.append(train_loss/n_iter)
     test_losses.append(test_loss)
+    m = {"test_loss": test_losses, "train_error": train_error_rates, "test_error": test_error_rates}
 
     if epoch%1 == 0:
       print('Epoch: {}/{}, Loss: {:.4f}, Error Rate: {:.1f}%'.format(epoch+1, num_epochs, train_loss/n_iter, 100*train_error_rate))
