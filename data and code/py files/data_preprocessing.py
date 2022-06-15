@@ -43,7 +43,7 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p):
   print(f"Type of features: {type(features)}")
   print(f"Shape of one obs: {features[0].size()}")
   labels = getLabels(df_timestamps, df_diag_acts)
-  print("Labels size: {}".format(labels.size()))
+  print("Labels size: {}".format(len(labels)))
 
   dataset_path = './processed-data/dataset-5.pkl'
   data_5 = dataset(features, labels, p=p, df_timestamps=df_timestamps)
@@ -196,11 +196,11 @@ def getFeatures(segment_paths, df_timestamps, p):
   '''
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
   '''
-  p["nfft"] = 512
-  p["hop_length"] = int(512/2)
-  p["win_length"] = 512
-  # p["fmax"] = sr/2
-  p["n_mels"] = 128
+  p["nfft"] = 400
+  p["hop_length"] = 200
+  p["win_length"] = 400
+  p["fmax"] = 400
+  p["n_mels"] = 16
   print("-----------------------------------")
   print("Getting features")
   print("-----------------------------------")
