@@ -49,7 +49,7 @@ from data_preprocessing import *
 # mlflow.set_tracking_uri(f'https://dagshub.com/Viv-Crowe/speechRecForMeeting.mlflow')
 
 # Pre-processing
-
+# diag_acts_path = processDialogueActs(path2all_xml_files)
 # [segment_full_paths, df_timestamps] = processSignals("Signals-10M", rootPath)
 
 p = {'segment_length': 10, 'overlap_length': 1}
@@ -57,30 +57,14 @@ segment_paths = glob.glob('./segments-5/*.wav')
 
 with open('./processed-data/dialogue-acts-prepped.pkl', "rb") as f:
     df_diag_acts = pickle.load(f)
+df_diag_acts.reset_index(inplace=True)
 
-df_timestamps = pd.DataFrame(columns=['meeting_id','st_time','ed_time'])
-for audio_file in glob.glob('*.wav'):
-    df_timestamps_t = getInputSegmentTimes(audio_file, 10, 1)
-    df_timestamps = df_timestamps.append(df_timestamps_t)
-    print(f"df_timestamps from {audio_file} is {df_timestamps.shape}")
-    print(f"{audio_file} segment times obtained.\n")
-  
-with open('processed-data/df_timestamps_5.pkl', "wb") as f:
-    pickle.dump(df_timestamps, f)
+with open('processed-data/df_timestamps.pkl', "rb") as f:
+    df_timestamps = pickle.load(f)
+print("Precomputed dataframes loaded.")
 
+dataset_path = prepareDataset(segment_paths, df_diag_acts.loc[1:6, :], df_timestamps, p)
 
-
-# with open('processed-data/df_timestamps.pkl', "rb") as f:
-#     df_timestamps = pickle.load(f)
-
-print(df_timestamps.head())
-print(df_timestamps.drop([1], axis = 0).head())
-# prepareDataset(segment_paths, df_diag_acts, df_timestamps, p)
-
-
-
-# [features, df_timestamps] = processSegments("Signals-10M")
-# diag_acts_path = processDialogueActs(path2all_xml_files)
 
 # device = "cuda" if torch.cuda.is_available() else "cpu"
 # kwargs = {'num_workers': 1, 'pin_memory': True} if device=='cuda' else {}

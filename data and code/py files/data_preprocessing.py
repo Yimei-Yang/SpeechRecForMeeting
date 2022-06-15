@@ -11,6 +11,7 @@ from pathlib import Path
 import torch
 import glob, os
 import librosa
+import pickle
 
 import torch
 from torch.utils.data import Dataset
@@ -38,22 +39,27 @@ class dataset(Dataset):
 def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p):
 
   features, df_timestamps, p = getFeatures(segment_paths, df_timestamps, p)
-  print("Feature size: {}".format(features.size))
-  labels = getLabels(df_timestamps, df_diag_acts)
-  print("Labels size: {}".format(features.size))
-
-  dataset_path = './processed-data/whole-dataset.pkl'
-  data_5 = dataset(features, df_timestamps, labels)
   print(f"Number of obs: {len(features)}")
   print(f"Type of features: {type(features)}")
-  print(f"Shape of features: {features[3].size}")
-  print(f"Number of labels: {len(labels)}")
-  print(f"Type of features: {type(labels)}")
+  print(f"Shape of one obs: {features[0].size()}")
+  labels = getLabels(df_timestamps, df_diag_acts)
+  print("Labels size: {}".format(labels.size()))
 
-  # with open(dataset_path, 'wb') as f:
-  #   print("Writing to {}".format(dataset_path))
-  #   pickle.dump(data_whole, f)
-  
+  dataset_path = './processed-data/dataset-5.pkl'
+  data_5 = dataset(features, labels, p=p, df_timestamps=df_timestamps)
+
+  print(f"Number of labels: {len(labels)}")
+  print(f"Type of labels: {type(labels)}")
+
+  data_5.p['num of features'] = len(data_5.features)
+  data_5.p['feature shape'] = len(data_5.features[0].size())
+  data_5.p['num of labels'] = len(data_5.labels)
+  data_5.p['num of interruptions'] = sum(data_5.labels)
+  print(data_5.p)
+
+  with open(dataset_path, 'wb') as f:
+    print("Writing to {}".format(dataset_path))
+    pickle.dump(data_5, f)
 
   # feature_list = features.numpy()
   # un_feature = []
@@ -88,18 +94,18 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p):
   #   print("Writing to {}".format(un_dataset_path))
   #   pickle.dump(data_un, f)
   # return dataset_path, in_dataset_path, un_dataset_path
+  return dataset_path
 
 def processSignals(signals_folder, rootPath):
   '''
   inputs path (str) to 
   '''
-  os.chdir(signals_folder)
   p = {}
-  segment_length, overlap_length = 10, 1 # must be an int
-  p['segment_length'] = segment_length
-  p['overlap_length'] = overlap_length
+  p['segment_length'] = 10 # must be an int
+  p['overlap_length'] = 1 # must be an int
 
-  df_timestamps = pd.DataFrame()
+  os.chdir(signals_folder)
+  df_timestamps = pd.DataFrame(columns=['meeting_id','st_time','ed_time'])
   segments_path = []
   for audio_file in glob.glob('*.wav'):
     df_timestamps_t = getInputSegmentTimes(audio_file, segment_length, overlap_length)
@@ -107,11 +113,10 @@ def processSignals(signals_folder, rootPath):
     df_timestamps = df_timestamps.append(df_timestamps_t)
     segments_path.append(segments_paths_t)
     print(f"{audio_file} segmented.\n")
-  
-  with open('processed-data/df_timestamps.pkl', "wb") as f:
-    pickle.dump(df_timestamps, f)
 
   os.chdir(rootPath)
+  with open('processed-data/df_timestamps.pkl', "wb") as f:
+    pickle.dump(df_timestamps, f)
 
   print("Number of segments: {}".format(len(segments_path)))
   print("df_timestamps shape: {}".format(df_timestamps.shape))
@@ -196,8 +201,10 @@ def getFeatures(segment_paths, df_timestamps, p):
   p["win_length"] = 512
   # p["fmax"] = sr/2
   p["n_mels"] = 128
-
-  #print("Number of segments: {}".format(len(segments)))
+  print("-----------------------------------")
+  print("Getting features")
+  print("-----------------------------------")
+  print("Number of segments: {}".format(len(segment_paths)))
   features = []
   #print(df_timestamps.describe)
   #print("timestamp length", df_timestamps.shape[0])
@@ -205,37 +212,40 @@ def getFeatures(segment_paths, df_timestamps, p):
   df_timestamps.reset_index(inplace=True)
   #print(df_timestamps.iloc[:, 0])
   #print(df_timestamps.loc[[792]])
-  #print("segments length", len(segments))
+  
   for idx, segment in enumerate(segment_paths):
 
     signal, sr = librosa.load(segment, sr=None)
 
     if signal is None or len(signal) == 0:
+      print(f"segment {idx} didn't exist or was empty.")
       df_timestamps = df_timestamps.drop([idx])
-    elif idx == (len(segment_paths)-1):
-      df_timestamps = df_timestamps[:-1]
     else:
       melspect = librosa.feature.melspectrogram(signal, n_fft = p["nfft"], hop_length = p["hop_length"], win_length = p["win_length"], n_mels = p["n_mels"])
-      #save all np.arrays(.wav) files into an array -> X dataset
-      if features and not melspect.shape == features[0].shape :
-        #print(df_timestamps.loc[[idx]])
-        df_timestamps = df_timestamps.drop([idx])
-      else:
-        features.append(melspect)
-  #print("Finished computing features")
+      feat = torch.Tensor(melspect)
+      feat = feat.reshape(1, melspect.shape[0],melspect.shape[1])
+      features.append(feat)
+      print(f"Computed feature for segment {segment}")
+      
   #print("length of the features", len(features))
   shape = features[0].shape
-  for x in features:
+  print(f"Shape of one feature: {shape}")
+
+  for idx,x in enumerate(features):
     if not x.shape==shape:
-      print(x.shape)
-  features = np.stack(features)
-  features = torch.Tensor(features)
-  features = features.reshape(features.shape[0], 1, features.shape[1], features.shape[2])
+      df_timestamps = df_timestamps.drop([idx])
+      print(f"Incorrect feature shape found: {x.shape}")
+  print(f"data_5.features is a {type(features)}")
+  print(f"data_5 has {len(features)} features")
+  # features = np.stack(features)
+  # features = torch.Tensor(features)
+  # features = features.reshape(features.shape[0], 1, features.shape[1], features.shape[2])
+  
   #print(features.shape)
   #print("length of feature list", features.shape[0])
   #print(features[0][0].shape)
   #print("length of timestamps", df_timestamps.shape[0])
-  df_timestamps.reset_index(inplace=True)
+  # df_timestamps.reset_index(inplace=True)
 
   return features, df_timestamps, p
 
@@ -273,7 +283,7 @@ def dialogueActsXMLtoPd(pathToDialogueActs):
   df.loc[:, 'st_time'] = pd.to_numeric(df.loc[:, 'st_time'])
   df.loc[:, 'ed_time'] = pd.to_numeric(df.loc[:, 'ed_time'])
   df = df.drop_duplicates(keep='first')
-  
+  df.reset_index(inplace=True)
   df['meeting_id'] = df['meeting_id'].str[:6]
   print("Finished converting dialogue acts XML files")
   return df
@@ -305,50 +315,26 @@ def addDAoIVariable(df_diag_acts):
   return df_diag_acts
 
 def getLabels(df_timestamps, df_diag_acts):
-
   '''
   input: df_timestamps[], df_diag_acts['meeting_id','st_time','ed_time']
   output: boolean vector with the same number of rows as df_timestamps
   '''
-  
-  counts = np.zeros(df_timestamps.shape[0])
-  #print("length of df_timestamps", df_timestamps.shape[0])
-  df_it = df_diag_acts.loc[df_diag_acts['DAoI'] == True]
-  #print("whole shape", df_diag_acts.shape[0])
-  #print("true shape", df_it.shape[0])
-  #print(df_timestamps)
-  for seg_index, seg_row in df_timestamps.iterrows():
+  print("-----------------------------------")
+  print("Getting labels")
+  print("-----------------------------------")
+  labels = np.zeros(df_timestamps.shape[0])
+  for diag_acts_index, diag_acts_row in df_diag_acts.iterrows():
     #print("df_timestamps row length", seg_index)
-    for diag_acts_index, diag_acts_row in df_it.iterrows():
+    for seg_index, seg_row in df_timestamps.iterrows():
       if seg_row['meeting_id'] != diag_acts_row['meeting_id']:
         continue
       elif seg_row['st_time'] < diag_acts_row['st_time'] and seg_row['ed_time'] > diag_acts_row['ed_time']:
-        counts[seg_index] += 1
-      else:
-        counts[seg_index] = 0
+        if labels[seg_index] == 0: 
+          print(f"Found segment for iterruption {diag_acts_index}: {seg_index}")
+          labels[seg_index] = 1
+      else: None
 
-  # label as True if there's at least one entire interruption in the segment
-  for idx, num in enumerate(counts):
-    if num>0:
-      counts[idx] = int(1)
-    else:
-      counts[idx] = int(0)
-  A = [int(counts) for counts in counts]
-  #print("type of A", type(A[0]))
-  #non = 0
-  #yes=0
-  #for x in A:
-    #if x == 0:
-      #non = non+1
-    #else:
-      #yes = yes+1
-  #print(len(A))
-  #print("non", non, "yes", yes)
-  #print("Finished getting labels")
-  #print(A)
-  #print("type of lable list is", type(A))
-  #print("type of lable is", type(A[0]))
-  return A
+  return labels
 
 def crossJoin (list1,list2):
   crossJoined_list = []
