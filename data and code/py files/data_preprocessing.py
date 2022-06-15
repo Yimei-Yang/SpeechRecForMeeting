@@ -344,14 +344,3 @@ def getLabels(df_timestamps, df_diag_acts):
   #print("type of lable is", type(A[0]))
   return A
 
-def crossJoin (list1,list2):
-  crossJoined_list = []
-  
-  for i in range(0,len(list1)):
-    inner_list = []
-    for j in range(0,1):
-      inner_list.append(list1[i])
-      inner_list.append(list2[i])
-    crossJoined_list.append(inner_list)
-
-  return crossJoined_list
