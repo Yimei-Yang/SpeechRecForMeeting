@@ -4,13 +4,16 @@ from sklearn.linear_model import roc_curve
 class LogisticRegression(torch.nn.Module):
      def __init__(self, input_dim, output_dim):
          super(LogisticRegression, self).__init__()
-         self.linear = torch.nn.Linear(input_dim, output_dim)     def forward(self, x):
+         self.linear = torch.nn.Linear(input_dim, output_dim)     
+         
+    def forward(self, x):
          outputs = torch.sigmoid(self.linear(x))
          return outputs
 
 
 
-def initialize(features):quit()
+def initialize(features):
+    quit()
     n = features.size(0)
     p = features.size(1)*features.size(2)
     features = torch.reshape(features, (n, p))

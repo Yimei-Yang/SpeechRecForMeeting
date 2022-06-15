@@ -13,78 +13,8 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 import torch.optim as optim
 
-'''
-this void function should be used directly, gives an example of X and Y respectively
-'''
+from sklearn.metrics import roc_auc_score,precision_score,recall_score,accuracy_score
 
-def data_retrieval():
-    from google.colab import drive
-    import pickle
-
-    # This will prompt for authorization.
-    drive.mount('/content/drive')
-
-    DATA_PATH = "/content/drive/My Drive/Team 6/processed-data"
-    features= open(DATA_PATH+'/features-test.pkl','rb')
-    labels= open(DATA_PATH+'/labels-test.pkl','rb')
-    features_list = pickle.load(features)
-    labels_list = pickle.load(labels)
-
-
-    print("features_list","\n", features_list[:5])
-    print("length", len(features_list)) 
-    print("width", len(features_list[0]))
-    print("-----------------")
-    print("labels_list","\n",labels_list[:5])
-    print("length", len(labels_list)) 
-    print("width", labels_list[0])
-
-
-'''
-this function is for join X1 and Y1 as a pair
-
-list1 = np.array([['a', 'b'], ['c','d'],['e','f']])
-list2 = np.array([[True], [False], [True]])
-list3 = crossJoin (list1,list2)
-list3
->>>[[array(['a', 'b'], dtype='<U1'), array([1])],
-    [array(['c', 'd'], dtype='<U1'), array([0])],
-    [array(['e', 'f'], dtype='<U1'), array([1])]]
-
-'''
-def crossJoin(list1,list2):
-  crossJoined_list = []
-  
-  for i in range(0,len(list1)):
-    inner_list = []
-    for j in range(0,1):
-      inner_list.append(list1[i])
-      inner_list.append(list2[i])
-    crossJoined_list.append(inner_list)
-
-  return crossJoined_list
-
-def train_test_split(tensor_list,labels_list):
-    #1. convert a list of images(np.arrays) to a 3D tensor
-    tensor_list = [torch.from_numpy(item) for item in features_list]
-    tensor_list = tensor_list
-    labels_list = labels_list
-    #2. add one singleton axis (you can use np.expand_dims for that) to get 4D array with channels dimension equal to 1
-    ##?? since we are only look into 1 channel so no need to make it 4d?
-    tensor = np.expand_dims(tensor_list,axis=1)
-    #3. use train_test_split from sklearn because it allows to shuffle your data before splitting
-    X_train,X_test,Y_train,Y_test = train_test_split(tensor_list, labels_list, test_size=0.1, train_size=0.8, random_state=1, shuffle=True)
-    X_val, X_test, Y_val, Y_test = train_test_split(X_test, Y_test, test_size=0.5, random_state=1)
-    return X_train, Y_train, X_test, Y_test, X_val, Y_val
-
-def get_dataloader(X_train, Y_train, X_test, Y_test, X_val, Y_val):
-    train_data = crossJoin(X_train, Y_train)
-    val_data = crossJoin(X_val, Y_val)
-    test_data = crossJoin(X_test,Y_test)
-    train_dataloader = DataLoader(train_data, batch_size=4, shuffle=True)
-    val_dataloader = DataLoader(val_data, batch_size=4, shuffle=True)
-    test_dataloader = DataLoader(test_data, batch_size=4, shuffle=True)
-    return train_dataloader, val_dataloader, test_dataloader
 
 class CNN(nn.Module):
     def __init__(self):
@@ -105,42 +35,6 @@ class CNN(nn.Module):
         x = self.fc3(x)
         return x
 
-
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-
-
-def training(epoches, train_dataloader, loss_fnc, optimizer, criterion):
-    for epoch in range(epoches):  # loop over the dataset multiple times
-
-        running_loss = 0.0
-        for i, data in enumerate(train_dataloader, 0):
-            # get the inputs; data is a list of [inputs, labels]
-            inputs, labels = data
-
-            # zero the parameter gradients
-            optimizer.zero_grad()
-
-            # forward + backward + optimize
-            outputs = CNN(inputs)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
-
-            # print statistics
-            running_loss += loss.item()
-            if i % 4 == 3:    # print every 4 mini-batches
-                print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 4:.3f}')
-                running_loss = 0.0
-
-    print('Finished Training')
-
-
-'''
-
-NEEDS MODIFICATION
-
-'''
 def prediction(loader, model):
 
   correct = 0
@@ -152,7 +46,9 @@ def prediction(loader, model):
       # switch tensor type to GPU
       images = images.cuda()
       labels = labels.cuda()
-    
+      
+      
+    #print(image.shape, 'test')
     outputs = model(images)
     
     loss = criterion(outputs, labels)
@@ -166,30 +62,85 @@ def prediction(loader, model):
     
   return losses/len(list(loader)), 1 - correct/total # we need to normalize loss with respect to the number of batches 
 
+def train(model, x_train, y_train):
+      #evaluation
+  criterion = nn.CrossEntropyLoss()
+  optimizer = optim.SGD(CNN.parameters(), lr=0.01, momentum=0.9)
+
+  train_losses = []
+  test_losses = []
+
+  train_error_rates = []
+  test_error_rates = []
+
+  y_hat = []
 
 
-'''
+  if use_gpu:
+    # switch model to GPU
+    CNN.cuda()
 
-NEEDS MODIFICATION
+  num_epochs = 15
 
-'''
-def validating():
-    return 0
+  for epoch in range(num_epochs): 
+    train_loss = 0 
+    n_iter = 0 
+    total = 0
+    correct = 0
 
 
-'''
+    for i, (images, labels) in enumerate(train_dataloader): 
+      optimizer.zero_grad() 
 
-NEEDS MODIFICATION
+      if use_gpu: 
+        images = images.cuda()
+        labels = labels.cuda()
 
-'''
-def testing():
-    return 0
+      #print(images.shape, 'train')
+      outputs = CNN(images)
+      
+      # to compute the train_error_rates  
+      _, predictions = torch.max(outputs, 1)
+      correct += torch.sum(labels == predictions).item()
+      total += labels.shape[0]
+      
+      # compute loss
+      #print(outputs.shape)
+      #print(labels.shape)
+      #print(labels) 
+      loss_bs = criterion(outputs, labels)
+      # compute gradients
+      loss_bs.backward()
+      # update weights
+      optimizer.step()
 
-'''
+      train_loss += loss_bs.detach().item()
 
-NEEDS MODIFICATION
+      n_iter += 1
 
-'''
+    train_error_rate = 1 - correct/total
 
-def plotting():
-    return 0
+    with torch.no_grad():
+      test_loss, test_error_rate = prediction(val_dataloader, CNN)
+
+    train_error_rates.append(train_error_rate)
+    test_error_rates.append(test_error_rate)
+    train_losses.append(train_loss/n_iter)
+    test_losses.append(test_loss)
+
+    y_hat.append(1-test_error_rate)
+
+    if epoch%1 == 0:
+      print('Epoch: {}/{}, Loss: {:.4f}, Error Rate: {:.1f}%'.format(epoch+1, num_epochs, train_loss/n_iter, 100*train_error_rate))
+  return y_hat
+
+def evaluate(y_true, y_hat):
+  y_hat_class = [1 if x >= 0.5 else 0 for x in y_hat]  # convert probability to class for classification report
+
+  #report_string += classification_report(y_true, y_hat_class)
+  roc_auc = roc_auc_score(y_true, y_hat)
+  precision = precision_score(y_true, y_hat)
+  recall = recall_score(y_true, y_hat)
+  accuracy = accuracy_score(y_true, y_hat) 
+    
+  return roc_auc, precision, recall, accuracy
