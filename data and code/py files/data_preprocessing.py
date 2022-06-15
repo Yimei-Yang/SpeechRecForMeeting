@@ -45,21 +45,21 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p):
   labels = getLabels(df_timestamps, df_diag_acts)
   print("Labels size: {}".format(len(labels)))
 
-  dataset_path = './processed-data/dataset-5.pkl'
-  data_5 = dataset(features, labels, p=p, df_timestamps=df_timestamps)
+  dataset_path = './processed-data/dataset-whole.pkl'
+  ds = dataset(features, labels, p=p, df_timestamps=df_timestamps)
 
   print(f"Number of labels: {len(labels)}")
   print(f"Type of labels: {type(labels)}")
 
-  data_5.p['num of features'] = len(data_5.features)
-  data_5.p['feature shape'] = len(data_5.features[0].size())
-  data_5.p['num of labels'] = len(data_5.labels)
-  data_5.p['num of interruptions'] = sum(data_5.labels)
-  print(data_5.p)
+  ds.p['num of features'] = len(ds.features)
+  ds.p['feature shape'] = len(ds.features[0].size())
+  ds.p['num of labels'] = len(ds.labels)
+  ds.p['num of interruptions'] = sum(ds.labels)
+  print(ds.p)
 
   with open(dataset_path, 'wb') as f:
     print("Writing to {}".format(dataset_path))
-    pickle.dump(data_5, f)
+    pickle.dump(ds, f)
 
   # feature_list = features.numpy()
   # un_feature = []
@@ -235,8 +235,8 @@ def getFeatures(segment_paths, df_timestamps, p):
     if not x.shape==shape:
       df_timestamps = df_timestamps.drop([idx])
       print(f"Incorrect feature shape found: {x.shape}")
-  print(f"data_5.features is a {type(features)}")
-  print(f"data_5 has {len(features)} features")
+  print(f"ds.features is a {type(features)}")
+  print(f"ds has {len(features)} features")
   # features = np.stack(features)
   # features = torch.Tensor(features)
   # features = features.reshape(features.shape[0], 1, features.shape[1], features.shape[2])
