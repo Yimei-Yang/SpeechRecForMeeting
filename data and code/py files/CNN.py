@@ -16,7 +16,7 @@ import torch.optim as optim
 from sklearn.metrics import roc_auc_score,precision_score,recall_score,accuracy_score
 
 
-class CNN(nn.Module):
+class model(nn.Module):
     def __init__(self):
         super().__init__()
         self.conv1 = nn.Conv2d(4, 6, 5)
@@ -46,8 +46,7 @@ def prediction(loader, model):
       # switch tensor type to GPU
       images = images.cuda()
       labels = labels.cuda()
-      
-      
+       
     #print(image.shape, 'test')
     outputs = model(images)
     
@@ -63,7 +62,7 @@ def prediction(loader, model):
   return losses/len(list(loader)), 1 - correct/total # we need to normalize loss with respect to the number of batches 
 
 def train(model, x_train, y_train):
-      #evaluation
+  #evaluation
   criterion = nn.CrossEntropyLoss()
   optimizer = optim.SGD(CNN.parameters(), lr=0.01, momentum=0.9)
 
@@ -132,6 +131,7 @@ def train(model, x_train, y_train):
 
     if epoch%1 == 0:
       print('Epoch: {}/{}, Loss: {:.4f}, Error Rate: {:.1f}%'.format(epoch+1, num_epochs, train_loss/n_iter, 100*train_error_rate))
+  
   return y_hat
 
 def evaluate(y_true, y_hat):
