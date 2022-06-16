@@ -71,16 +71,10 @@ def evaluation(loader, model, criterion):
     #keep track of each batch
     for j in range(0,len(labels)):
       y_true_per_epoch.append(int(labels[j]))
-      y_hats_per_epoch.append(correct/total)
-
-  #print(y_true_per_epoch,"\n",len(y_true_per_epoch))
-  #print(y_hats_per_epoch,"\n",len(y_hats_per_epoch))
-
-  #!thresh hold can change??  
-  y_hat_class = [1 if x >= 0.5 else 0 for x in y_hats_per_epoch]  # convert probability to class for classification report
+      y_hats_per_epoch.append(outputs[j][1])
 
   #ap_score_per_epoch <- float type
-  ap_score_per_epoch = average_precision_score(y_true_per_epoch, y_hat_class)
+  ap_score_per_epoch = average_precision_score(y_true_per_epoch, y_hats_per_epoch)
 
   #print(ap_score_per_epoch)
 
@@ -122,9 +116,6 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
       total += labels.shape[0]
       
       # compute loss
-      #print(outputs.shape)
-      #print(labels.shape)
-      #print(labels) 
       loss_bs = criterion(outputs, labels)
       # compute gradients
       loss_bs.backward()
@@ -152,9 +143,6 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
     from collections import defaultdict
 
     m = defaultdict(list)
-    #m.update({"num_epochs":[-1],"test_loss":[-1],"Error Rate":[-1],"Average_precision_score":[-1]})
-
-  #print(len(train_losses))
 
     if epoch%1 == 0:
       print('Epoch: {}/{}, Loss: {:.4f}, Error Rate: {:.1f}%, Average_precision_score: {:.1f}'.format(epoch+1, num_epochs, train_loss/n_iter, 100*train_error_rate, ap_score))
@@ -166,7 +154,7 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
     m["Average_precision_score"].append(ap_score_list[i])
 
   print("finished")
-  return m #list of y_true and y_hat
+  return m 
 
 def initialize():
   return CNN()
