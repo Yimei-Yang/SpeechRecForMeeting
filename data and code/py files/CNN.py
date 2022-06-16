@@ -41,34 +41,50 @@ class CNN(nn.Module):
         x = self.fc3(x)
         return x
 
-def prediction(loader, model, criterion):
+def evaluation(loader, model, criterion):
 
-  correct = 0
-  total = 0
-  losses = 0
+  y_true_per_epoch = []
+  y_hats_per_epoch = []
 
   for i, (images, labels) in enumerate(loader):
-    use_gpu = True
+    use_gpu = torch.cuda.is_available()
     if use_gpu:
       # switch tensor type to GPU
       images = images.cuda()
       labels = labels.cuda()
-       
+
+      
     #print(image.shape, 'test')
     outputs = model(images)
     predictions = outputs[:,1].clone()
     #print('output size: ', predictions.size())
     
     loss = criterion(outputs, labels)
-
-    # _, predictions = torch.max(outputs, 1)
   
-    correct += torch.sum(labels == predictions).item()
+    _, predictions = torch.max(outputs, 1)
+
+    correct += torch.sum(labels == predictions).item() #predictions <class 'torch.Tensor'>
     total += labels.shape[0]
     
     losses += loss.data.item()
     
-  return losses/len(list(loader)), 1 - correct/total # we need to normalize loss with respect to the number of batches 
+    #keep track of each batch
+    for j in range(0,len(labels)):
+      y_true_per_epoch.append(int(labels[j]))
+      y_hats_per_epoch.append(correct/total)
+
+  #print(y_true_per_epoch,"\n",len(y_true_per_epoch))
+  #print(y_hats_per_epoch,"\n",len(y_hats_per_epoch))
+
+  #!thresh hold can change??  
+  y_hat_class = [1 if x >= 0.5 else 0 for x in y_hats_per_epoch]  # convert probability to class for classification report
+
+  #ap_score_per_epoch <- float type
+  ap_score_per_epoch = average_precision_score(y_true_per_epoch, y_hat_class)
+
+  #print(ap_score_per_epoch)
+
+  return losses/len(list(loader)), 1 - correct/total, ap_score_per_epoch # we need to normalize loss with respect to the number of batches 
 
 def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epochs=5):
   train_losses = []
@@ -76,6 +92,8 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
 
   train_error_rates = []
   test_error_rates = []
+
+  ap_score_list = []
 
   use_gpu = True
   if use_gpu:
@@ -87,7 +105,7 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
     n_iter = 0 
     total = 0
     correct = 0
-
+    
     for i, (images, labels) in enumerate(train_dataloader): 
       optimizer.zero_grad() 
 
@@ -95,7 +113,7 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
         images = images.cuda()
         labels = labels.cuda()
 
-      # print(images.shape, 'train')
+      #print(images.shape, 'train')
       outputs = CNN(images)
       
       # to compute the train_error_rates  
@@ -104,6 +122,9 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
       total += labels.shape[0]
       
       # compute loss
+      #print(outputs.shape)
+      #print(labels.shape)
+      #print(labels) 
       loss_bs = criterion(outputs, labels)
       # compute gradients
       loss_bs.backward()
@@ -115,35 +136,37 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
       n_iter += 1
 
     train_error_rate = 1 - correct/total
+    
+    ap_score = 0
 
     with torch.no_grad():
-      test_loss, test_error_rate = prediction(val_dataloader, CNN, criterion)
+      test_loss, test_error_rate, ap_score = evaluation(val_dataloader, CNN)
 
     train_error_rates.append(train_error_rate)
     test_error_rates.append(test_error_rate)
     train_losses.append(train_loss/n_iter)
     test_losses.append(test_loss)
-    m = {}
-    # m["test_loss"] = test_losses
-    # m["train_error"] = train_error_rates
-    # m["test_error"] = test_error_rates
+
+    ap_score_list.append(ap_score)
+
+    from collections import defaultdict
+
+    m = defaultdict(list)
+    #m.update({"num_epochs":[-1],"test_loss":[-1],"Error Rate":[-1],"Average_precision_score":[-1]})
+
+  #print(len(train_losses))
 
     if epoch%1 == 0:
-      print('Epoch: {}/{}, Loss: {:.4f}, Error Rate: {:.1f}%'.format(epoch+1, num_epochs, train_loss/n_iter, 100*train_error_rate))
-  
-  print('Finished Training')
+      print('Epoch: {}/{}, Loss: {:.4f}, Error Rate: {:.1f}%, Average_precision_score: {:.1f}'.format(epoch+1, num_epochs, train_loss/n_iter, 100*train_error_rate, ap_score))
+
+  for i in range(0, num_epochs):
+    m["Num_epochs"].append(i+1)
+    m["Test_loss"].append(train_losses[i])
+    m["Error_Rate"].append(100*train_error_rates[i])
+    m["Average_precision_score"].append(ap_score_list[i])
+
+  print("finished")
   return m #list of y_true and y_hat
-
-def evaluate(y_true, y_hat):
-  y_hat_class = [1 if x >= 0.5 else 0 for x in y_hat]  # convert probability to class for classification report
-
-  #report_string += classification_report(y_true, y_hat_class)
-  roc_auc = roc_auc_score(y_true, y_hat)
-  precision = precision_score(y_true, y_hat)
-  recall = recall_score(y_true, y_hat)
-  accuracy = accuracy_score(y_true, y_hat) 
-    
-  return roc_auc, precision, recall, accuracy
 
 def initialize():
   return CNN()
