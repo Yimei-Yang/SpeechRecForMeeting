@@ -26,7 +26,7 @@ import wave, librosa
 print(f"Running in {os.getcwd()}")
 print("External packages imported\n")
 
-google = False
+google = True
 if google:
     from google.colab import drive
     drive.mount('/content/drive')
@@ -41,70 +41,47 @@ sys.path.append(rootPath + '/py files')
 from data_preprocessing import *
 
 # # DagsHub set-up --------------------------------
-# os.environ['MLFLOW_TRACKING_USERNAME'] = input('Enter your DAGsHub username: ')
-# os.environ['MLFLOW_TRACKING_PASSWORD'] = getpass('Enter your DAGsHub access token: ')
-# os.environ['MLFLOW_TRACKING_PROJECTNAME'] = input('Enter your DAGsHub project name: ') #speechRecForMeeting
+os.environ['MLFLOW_TRACKING_USERNAME'] = 'team-token'
+os.environ['MLFLOW_TRACKING_PASSWORD'] = 'f01653d37636d9488c48cd922f6ab83881d2cf4a'
+os.environ['MLFLOW_TRACKING_PROJECTNAME'] = 'speechRecForMeeting' #speechRecForMeeting
 
-# mlflow.set_tracking_uri(f'https://dagshub.com/Viv-Crowe/speechRecForMeeting.mlflow')
+mlflow.set_tracking_uri(f'https://dagshub.com/Viv-Crowe/speechRecForMeeting.mlflow')
 
-# Pre-processing
-# diag_acts_path = processDialogueActs(path2all_xml_files)
+sys.path.append(rootPath + '/py files')
+from data_preprocessing import *
+from data_loader import *
+from CNN import *
+
+## Data pre-processing ##
+
 # [segment_full_paths, df_timestamps] = processSignals("Signals-10M", rootPath)
-
-p = {'segment_length': 10, 'overlap_length': 1}
-segment_paths = glob.glob('./segments/1/*.wav')[0:7000]
-
-with open('./processed-data/dialogue-acts-prepped.pkl', "rb") as f:
-    df_diag_acts = pickle.load(f)
-df_diag_acts.reset_index(inplace=True)
-
-with open('processed-data/df_timestamps.pkl', "rb") as f:
-    df_timestamps = pickle.load(f)
-print("Precomputed dataframes loaded.")
-
-dataset_path = prepareDataset(segment_paths, df_diag_acts, df_timestamps, p)
 
 # device = "cuda" if torch.cuda.is_available() else "cpu"
 # kwargs = {'num_workers': 1, 'pin_memory': True} if device=='cuda' else {}
 
-# from logistic_model import *
+## Load dataset ##
+DATA_PATH = rootPath + "/processed-data"
+pickle_file = DATA_PATH + "/dataset-10M.pkl"
+train_dataloader, val_dataloader, test_dataloader, p = prepareData(pickle_file)
+examineBatches(train_dataloader, val_dataloader, test_dataloader)
 
-# [model, features] = initialize(features)
+## Train dataset ##
+CNN = initialize()
+criterion = nn.CrossEntropyLoss()
+p['lr'] = 0.01
+p['momentum'] = 0.9
+optimizer = optim.SGD(CNN.parameters(), lr=p['lr'], momentum=p['momentum'])
+with mlflow.start_run(run_name="CNN on 10 meetings"):
+    use_gpu = torch.cuda.is_available()
+    m = train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epochs=5)
+    
+    # Log parameters + metrics
+    mlflow.log_params(p)
+    mlflow.log_param('CNN parameters',CNN.parameters())
+    mlflow.log_metrics(m)
+    # for i in epoch:
+    #   mlflow.log_metrics(test_error, step=i)
 
-# x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.25, random_state=0)
-
-#     # # Balance dataset
-#     count=Counter(y_train)
-#     class_count=np.array([count[0],count[1]])
-#     weight=1./class_count
-#     print(weight)
-
-#     samples_weight = np.array([weight[t] for t in y_train])
-#     samples_weight = torch.from_numpy(samples_weight)
-
-    # train_error_rate = 1 - correct/total
-    # mlflow.log_metric("train_error", train_error_rate)
-
-    # with torch.no_grad():
-    #     test_loss, test_error_rate, _ = prediction(val_dataloader, CNN)
-
-    # mlflow.log_metric("test_loss", test_loss)
-    # mlflow.log_metric("test_error_rate", test_error_rate)
-
-    # train_error_rates.append(train_error_rate)
-    # test_error_rates.append(test_error_rate)
-    # train_losses.append(train_loss/n_iter)
-    # test_losses.append(test_loss)
-    # mlflow.pytorch.autolog()
-    # if epoch%1 == 0:
-    #     print('Epoch: {}/{}, Loss: {:.4f}, Error Rate: {:.1f}%'.format(epoch+1, num_epochs, train_loss/n_iter, 100*train_error_rate))
-
-
-print('Finished Training')
-
-# # # Train and evaluate model
-# model = train(model, x_train, y_train)
-
+    
+## Evaluate model ##
 # results = evaluate(model, x_test, y_test)
-
-# f.close()
