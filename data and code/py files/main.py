@@ -68,7 +68,10 @@ with mlflow.start_run(run_name="CNN on 10 meetings"):
     use_gpu = torch.cuda.is_available()
     m = train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epochs=5)
     
-    # Log parameters + metrics
+    ## Evaluate model ##
+    # results = evaluate(model, m, testdata) 
+    # 
+
     mlflow.log_params(p)
     mlflow.log_param('CNN parameters',CNN.parameters())
     mlflow.log_metrics(m)
@@ -76,5 +79,3 @@ with mlflow.start_run(run_name="CNN on 10 meetings"):
     #   mlflow.log_metrics(test_error, step=i)
 
     
-## Evaluate model ##
-# results = evaluate(model, x_test, y_test)
