@@ -115,8 +115,6 @@ def processSignals(signals_folder, rootPath):
     print(f"{audio_file} segmented.\n")
 
   os.chdir(rootPath)
-  with open('processed-data/df_timestamps.pkl', "wb") as f:
-    pickle.dump(df_timestamps, f)
 
   print("Number of segments: {}".format(len(segments_path)))
   print("df_timestamps shape: {}".format(df_timestamps.shape))
