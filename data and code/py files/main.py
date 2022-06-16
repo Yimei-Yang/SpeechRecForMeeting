@@ -26,24 +26,30 @@ import wave, librosa
 print(f"Running in {os.getcwd()}")
 print("External packages imported\n")
 
-google = True
+# Select where you are running this script -----------------#
+
+s3 = True
+google = False
 if google:
     from google.colab import drive
     drive.mount('/content/drive')
     os.chdir("/content/drive/My Drive/Team 6")
     rootPath = "/content/drive/My Drive/Team 6"
     dataPath = rootPath
+
+
 else:
     rootPath = '/speechRecForMeeting'
     dataPath = ''
 
-sys.path.append(rootPath + '/py files')
+# -----------------------------------------------------------
+
 from data_preprocessing import *
 
 # # DagsHub set-up --------------------------------
 os.environ['MLFLOW_TRACKING_USERNAME'] = 'team-token'
 os.environ['MLFLOW_TRACKING_PASSWORD'] = 'f01653d37636d9488c48cd922f6ab83881d2cf4a'
-os.environ['MLFLOW_TRACKING_PROJECTNAME'] = 'speechRecForMeeting' #speechRecForMeeting
+os.environ['MLFLOW_TRACKING_PROJECTNAME'] = 'speechRecForMeeting'
 
 mlflow.set_tracking_uri(f'https://dagshub.com/Viv-Crowe/speechRecForMeeting.mlflow')
 
@@ -54,7 +60,12 @@ from CNN import *
 
 ## Data pre-processing ##
 
-# [segment_full_paths, df_timestamps] = processSignals("Signals-10M", rootPath)
+
+with contextlib.closing(wave.open('dialogue-acts-prepped.pkl','r')) as f:
+        df_diag_acts = pd.load(f)
+
+[segment_full_paths, df_timestamps] = processSignals("Signals-10M", rootPath)
+prepareDataset(segment_paths, df_diag_acts, df_timestamps, p)
 
 # device = "cuda" if torch.cuda.is_available() else "cpu"
 # kwargs = {'num_workers': 1, 'pin_memory': True} if device=='cuda' else {}

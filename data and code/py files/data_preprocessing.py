@@ -60,40 +60,6 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p):
   with open(dataset_path, 'wb') as f:
     print("Writing to {}".format(dataset_path))
     pickle.dump(ds, f)
-
-  # feature_list = features.numpy()
-  # un_feature = []
-  # un_label = []
-  # in_feature = []
-  # in_label = []
-  # interrupted, uniterrupted, df_timestamps = selectSample(labels, df_timestamps, feature_list)
-  # df_timestamps_in = df_timestamps[0]
-  # df_timestamps_un = df_timestamps[1]
-  # for data in uniterrupted:
-  #   un_feature.append(data[0])
-  #   un_label.append(data[1])
-  # for data in interrupted:
-  #   in_feature.append(data[0])
-  #   in_label.append(data[1])
-  # un_feature_tensor = torch.Tensor(un_feature)
-  # in_feature_tensor = torch.Tensor(in_feature)
-
-  # in_dataset_path = '.processed-data/interrupted-dataset.pkl'
-  # un_dataset_path = '.processed-data/uninterrupted-dataset.pkl'
-  # with open(dataset_path, 'wb') as f:
-  #   print("Writing to {}".format(dataset_path))
-  #   pickle.dump(data, f)
-
-
-  # data_in  = dataset(un_feature_tensor, df_timestamps_in, in_label)
-  # with open(in_dataset_path, 'wb') as f:
-  #   print("Writing to {}".format(in_dataset_path))
-  #   pickle.dump(data_in, f)
-  # data_un = dataset(in_feature_tensor,df_timestamps_un, un_label)
-  # with open(un_dataset_path, 'wb') as f:
-  #   print("Writing to {}".format(un_dataset_path))
-  #   pickle.dump(data_un, f)
-  # return dataset_path, in_dataset_path, un_dataset_path
   return dataset_path
 
 def processSignals(signals_folder, rootPath):
