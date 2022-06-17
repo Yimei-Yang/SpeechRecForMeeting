@@ -62,7 +62,7 @@ from CNN import *
 with open('dialogue-acts-prepped.pkl','rb') as f:
         df_diag_acts = pickle.load(f)
 
-[segment_full_paths, df_timestamps] = processSignals("Signals-new-10M", rootPath)
+[segment_full_paths, df_timestamps] = processSignals("Signals-new-10", rootPath)
 prepareDataset(segment_paths, df_diag_acts, df_timestamps, p)
 
 # device = "cuda" if torch.cuda.is_available() else "cpu"
