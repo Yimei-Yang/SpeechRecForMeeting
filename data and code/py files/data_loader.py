@@ -72,7 +72,7 @@ def prepareData(pickle_file):
     ## Load Data ##
     train_dataloader = DataLoader(train_data, batch_size=64, sampler = sampler)
     val_dataloader = DataLoader(val_data, batch_size=64, sampler = sampler_val)
-    test_dataloader = DataLoader(test_data, batch_size=64, d)
+    test_dataloader = DataLoader(test_data, batch_size=64, shuffle=True)
     print("Train/val/test data loading complete\n")
     return train_dataloader, val_dataloader, test_dataloader, p
 

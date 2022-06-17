@@ -91,7 +91,7 @@ p['momentum'] = 0.9
 optimizer = optim.SGD(CNN.parameters(), lr=p['lr'], momentum=p['momentum'])
 with mlflow.start_run(run_name="CNN on 10 meetings"):
     use_gpu = torch.cuda.is_available()
-    tr = train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epochs=5, use_gpu)
+    tr = train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epochs=5, use_gpu=use_gpu)
     train_error_rates, train_losses, test_error_rates, test_losses = tr
 
     y_hat, y_true, losses, error = prediction(test_dataloader, CNN, criterion)

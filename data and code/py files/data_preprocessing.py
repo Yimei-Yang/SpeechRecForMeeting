@@ -43,17 +43,15 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p, AWS=False):
   labels = getLabels(df_timestamps, df_diag_acts)
   print("Labels size: {}".format(len(labels)))
   p['# obs'] = len(labels)
-  p['# interp.s'] = sum(labels)
+  p['# itrpns'] = sum(labels)
   p['feature size'] = features[0].size(1)*features[0].size(2)
-  print("Rows timestamps: ", df_timeshapes.shape[0])
+  print("Rows timestamps: ", df_timestamps.shape[0])
 
-
+  data_4 = dataset(features, labels, p, df_timestamps)
   if AWS:
     data_key = 'dataset-4.pkl'
     bucket = 'ai4good-m6-2022'
-    data_2 = dataset(features, df_timestamps, labels)
-    
-    pickle_data_32 = pickle.dumps(data_2) 
+    pickle_data = pickle.dumps(data) 
     s3_resource = boto3.resource('s3')
     s3_resource.Object(bucket,key).put(Body=pickle_data_32)
 
@@ -61,7 +59,7 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p, AWS=False):
     dataset_path = './processed-data/dataset-4.pkl'
     with open(dataset_path, 'wb') as f:
           print("Writing to {}".format(dataset_path))
-          pickle.dump(data_whole, f)
+          pickle.dump(data_4, f)
     # -------------------------------------------------------
   
   return dataset_path, p
@@ -108,6 +106,7 @@ def processDialogueActs(path2all_xml_files):
   df_diag_acts = dialogueActsXMLtoPd(path2all_xml_files) # rootPath + '/dialogue-acts/*.xml'
   df_diag_acts = addDAoIVariable(df_diag_acts)
   df_diag_acts = df_diag_acts[df_diag_acts.DAoI]
+  df_diag_acts.reset_index(inplace=True, drop=True)
   diag_acts_path = 'dialogue-acts-prepped.pkl'
 
   with open(diag_acts_path, 'wb') as f:
@@ -140,8 +139,12 @@ def getInputSegmentTimes(audio_file, segment_length, overlap_length):
       list_of_timestamps.append([meeting_id,i,i+segment_length])
 
     df_timestamps = pd.DataFrame(list_of_timestamps, columns=['meeting_id','st_time','ed_time'])
-    df_timestamps = df_timestamps.reset_index(level=0)
-    df_timestamps["seg_id"] = df_timestamps["meeting_id"]+ df_timestamps["index"].astype(str)
+    df_timestamps = df_timestamps.reset_index(level=0) # these indexes are the segment number, so aren't unique
+    df_timestamps["seg_id"] = df_timestamps["meeting_id"]+ df_timestamps["index"].astype(str) # use indexes to make unique seg_ids
+    
+    del df["index"]
+    df_timestamps.loc[:, 'st_time'] = pd.to_numeric(df_timestamps.loc[:, 'st_time'])
+    df_timestamps.loc[:, 'ed_time'] = pd.to_numeric(df_timestamps.loc[:, 'ed_time'])
     return df_timestamps
 
 def getInputSegments(audio_file, df_timestamps, rootPath, AWS=False):
@@ -178,11 +181,11 @@ def getFeatures(segment_paths, df_timestamps, p, AWS=False):
   '''
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
   '''
-  p["nfft"] = 400
-  p["hop_length"] = 200
-  p["win_length"] = 400
-  p["fmax"] = 400
-  p["n_mels"] = 16
+  p["melspec: nfft"] = 400
+  p["melspec: hop length"] = 200
+  p["melspec: win length"] = 400
+  p["melspec: fmax"] = 400
+  p["melspec: n mels"] = 16
   print("-----------------------------------")
   print("Getting features")
   print("-----------------------------------")
@@ -190,7 +193,7 @@ def getFeatures(segment_paths, df_timestamps, p, AWS=False):
   features = []
   result = []
 
-  df_timestamps.reset_index(inplace=True)
+  df_timestamps.reset_index(inplace=True, drop=True)
 
   for idx, segment in enumerate(segment_paths):
     signal, sr = librosa.load(segment, sr=None)
@@ -200,11 +203,11 @@ def getFeatures(segment_paths, df_timestamps, p, AWS=False):
     elif idx == (len(segment_paths)-1):
       df_timestamps = df_timestamps[:-1]
     else:
-      melspect = librosa.feature.melspectrogram(signal, n_fft = p["nfft"], hop_length = p["hop_length"], win_length = p["win_length"], n_mels = p["n_mels"])
+      melspect = librosa.feature.melspectrogram(signal, n_fft = p["melspec: nfft"], hop_length = p["melspec: hop length"], win_length = p["melspec: win length"], n_mels = p["melspec: n mels"])
       feat = torch.Tensor(melspect)
       feat = feat.reshape(1, melspect.shape[0],melspect.shape[1])
       features.append(feat)
-      print(f"Computed feature for segment {segment}")
+      # print(f"Computed feature for segment {segment}")
   if len(features) > 0:
     shape = features[0].size()
     print(f"Shape of one feature: {shape}")
@@ -251,7 +254,7 @@ def dialogueActsXMLtoPd(pathToDialogueActs):
   df.loc[:, 'st_time'] = pd.to_numeric(df.loc[:, 'st_time'])
   df.loc[:, 'ed_time'] = pd.to_numeric(df.loc[:, 'ed_time'])
   df = df.drop_duplicates(keep='first')
-  df.reset_index(inplace=True)
+  df.reset_index(inplace=True, drop=True)
   df['meeting_id'] = df['meeting_id'].str[:6]
   print("Finished converting dialogue acts XML files")
   return df
@@ -292,18 +295,16 @@ def getLabels(df_timestamps, df_diag_acts):
   print("Getting labels")
   print("-----------------------------------")
   counts = np.zeros(df_timestamps.shape[0])
-  seg_index = 0 # don't use the index fromdf.iterrows(), they are non-unique segment id's
-  df_diag_acts.reset_index(inplace=True)
+  df_diag_acts.reset_index(inplace=True, drop=True)
+  df_timestamps.reset_index(inplace=True, drop=True)
   for diag_acts_index, diag_acts_row in df_diag_acts.iterrows():
     #print("df_timestamps row length", seg_index)
-    for _, seg_row in df_timestamps.iterrows():
+    for seg_index, seg_row in df_timestamps.iterrows():
       if seg_row['meeting_id'] != diag_acts_row['meeting_id']:
         continue
       elif seg_row['st_time'] < diag_acts_row['st_time'] and seg_row['ed_time'] > diag_acts_row['ed_time']:
-        
-        print(f"Found segment for iterruption {diag_acts_index}: {seg_index}")
+        print(f"Found segment for iterruption {diag_acts_index}: {seg_row['seg_id']}")
         counts[seg_index] += 1
-        counts[seg_index] = 1
       else: None
 
   labels = np.empty(len(counts))
