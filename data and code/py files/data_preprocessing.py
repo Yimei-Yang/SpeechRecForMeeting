@@ -272,6 +272,8 @@ def selectSample(label_list, df_timestamps, feature_list):
     if label == 1:
       interrupted_list.append((feature_list[idx],1))
       df_timestamps_in.append(df_timestamps.loc[idx])
+    # elif idx == (len(segments)-1):
+    #   df_timestamps = df_timestamps[:-1]
     else:
       uninterrupted_list.append((feature_list[idx],0))
       df_timestamps_un.append(df_timestamps.loc[idx])
