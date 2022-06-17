@@ -40,6 +40,7 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p, AWS=False):
   features, df_timestamps, p = getFeatures(segment_paths, df_timestamps, p)
   print("Feature size: {}".format(features[0].size()))
   print(f"Number of obs: {len(features)}")
+  print(f"Number of rows in df_timestamps: {df_timestamps.shape[0]}")
   labels = getLabels(df_timestamps, df_diag_acts)
   print("Labels size: {}".format(len(labels)))
   p['# obs'] = len(labels)
@@ -50,14 +51,14 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p, AWS=False):
   data = dataset(features, labels, p, df_timestamps)
 
   if AWS:
-    data_key = 'dataset-3-a.pkl'
+    data_key = 'dataset-4-test.pkl'
     bucket = 'ai4good-m6-2022'
     pickle_data = pickle.dumps(data) 
     s3_resource = boto3.resource('s3')
     s3_resource.Object(bucket,key).put(Body=pickle_data_32)
 
   else:
-    dataset_path = './processed-data/dataset-3-a.pkl'
+    dataset_path = './processed-data/dataset-4-test.pkl'
     with open(dataset_path, 'wb') as f:
           print("Writing to {}".format(dataset_path))
           pickle.dump(data, f)
@@ -219,7 +220,7 @@ def getFeatures(segment_paths, df_timestamps, p, AWS=False):
       df_timestamps = df_timestamps.drop([idx])
       print(f"Incorrect feature shape found: {x.size()}")
   print(f"features is a {type(features)} with {len(features)} elements: {features[0].size()}")
-
+  print(f"Number of features and df_timestamps are the same:  {len(features) == df_timestamps.shape[0]}")
   return features, df_timestamps, p
 
 def dialogueActsXMLtoPd(pathToDialogueActs):
