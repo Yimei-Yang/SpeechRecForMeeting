@@ -67,11 +67,6 @@ def evaluation(loader, model, criterion):
     
     losses += loss.data.item()
     
-<<<<<<< HEAD
-  return predictions, labels, losses/len(list(loader)), 1- correct/total # we need to normalize loss with respect to the number of batches 
-||||||| a5fe433
-  return losses/len(list(loader)), 1 - correct/total # we need to normalize loss with respect to the number of batches 
-=======
     #keep track of each batch
     for j in range(0,len(labels)):
       y_true_per_epoch.append(int(labels[j]))
@@ -83,7 +78,6 @@ def evaluation(loader, model, criterion):
   #print(ap_score_per_epoch)
 
   return losses/len(list(loader)), 1 - correct/total, ap_score_per_epoch # we need to normalize loss with respect to the number of batches 
->>>>>>> 54475575aee37c04d77b58d854cdf8ab4a6a878f
 
 def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epochs=5, use_gpu=False):
   train_losses = []
@@ -92,14 +86,8 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
   train_error_rates = []
   test_error_rates = []
 
-<<<<<<< HEAD
-||||||| a5fe433
-  use_gpu = True
-=======
   ap_score_list = []
 
-  use_gpu = True
->>>>>>> 54475575aee37c04d77b58d854cdf8ab4a6a878f
   if use_gpu:
     # switch model to GPU
     CNN.cuda()
@@ -143,72 +131,34 @@ def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epoch
     ap_score = 0
 
     with torch.no_grad():
-<<<<<<< HEAD
       predictions, test_loss, test_error_rate = prediction(val_dataloader, CNN, criterion)
-||||||| a5fe433
-      test_loss, test_error_rate = prediction(val_dataloader, CNN, criterion)
-=======
-      test_loss, test_error_rate, ap_score = evaluation(val_dataloader, CNN)
->>>>>>> 54475575aee37c04d77b58d854cdf8ab4a6a878f
 
     train_error_rates.append(train_error_rate)
     test_error_rates.append(test_error_rate)
     train_losses.append(train_loss) # train_losses.append(train_loss/n_iter)
     test_losses.append(test_loss)
-<<<<<<< HEAD
-||||||| a5fe433
-    m = {}
-    # m["test_loss"] = test_losses
-    # m["train_error"] = train_error_rates
-    # m["test_error"] = test_error_rates
-=======
 
     ap_score_list.append(ap_score)
 
     from collections import defaultdict
 
     m = defaultdict(list)
->>>>>>> 54475575aee37c04d77b58d854cdf8ab4a6a878f
 
     if epoch%1 == 0:
-<<<<<<< HEAD
-      print('Epoch: {}/{}, Loss: {:.4f}, Error Rate: {:.1f}%'.format(epoch+1, num_epochs, train_loss/n_iter, 100*train_error_rate))
-  print('Finished Training')
-  return train_error_rates, train_losses, test_error_rates, test_losses #list of y_true and y_hat
-||||||| a5fe433
-      print('Epoch: {}/{}, Loss: {:.4f}, Error Rate: {:.1f}%'.format(epoch+1, num_epochs, train_loss/n_iter, 100*train_error_rate))
-  
-  print('Finished Training')
-  return m #list of y_true and y_hat
-=======
       print('Epoch: {}/{}, Loss: {:.4f}, Error Rate: {:.1f}%, Average_precision_score: {:.1f}'.format(epoch+1, num_epochs, train_loss/n_iter, 100*train_error_rate, ap_score))
->>>>>>> 54475575aee37c04d77b58d854cdf8ab4a6a878f
 
-  for i in range(0, num_epochs):
-    m["Num_epochs"].append(i+1)
-    m["Test_loss"].append(train_losses[i])
-    m["Error_Rate"].append(100*train_error_rates[i])
-    m["Average_precision_score"].append(ap_score_list[i])
+  # for i in range(0, num_epochs):
+  #   m["Num_epochs"].append(i+1)
+  #   m["Test_loss"].append(train_losses[i])
+  #   m["Error_Rate"].append(100*train_error_rates[i])
+  #   m["Average_precision_score"].append(ap_score_list[i])
 
-<<<<<<< HEAD
-  #report_string += classification_report(y_true, y_hat_class)
+  print(classification_report(y_true, y_hat_class))
   roc_auc = roc_auc_score(y_true, y_hat)
   precision, recall, _ = precision_recall_curve(y_true, y_hat)
   accuracy = accuracy_score(y_true, y_hat) 
     
   return roc_auc, precision, recall, accuracy, y_hat_class
-||||||| a5fe433
-  #report_string += classification_report(y_true, y_hat_class)
-  roc_auc = roc_auc_score(y_true, y_hat)
-  precision = precision_score(y_true, y_hat)
-  recall = recall_score(y_true, y_hat)
-  accuracy = accuracy_score(y_true, y_hat) 
-    
-  return roc_auc, precision, recall, accuracy
-=======
-  print("finished")
-  return m 
->>>>>>> 54475575aee37c04d77b58d854cdf8ab4a6a878f
 
 def initialize():
   return CNN()

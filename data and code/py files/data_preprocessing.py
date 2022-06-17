@@ -35,19 +35,21 @@ class dataset(Dataset):
         sample = [self.features[idx], self.labels[idx]]
         return sample
 
-def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p):
+def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p, AWS=False):
 
   features, df_timestamps, p = getFeatures(segment_paths, df_timestamps, p)
-  print("Feature size: {}".format(features.size))
+  print("Feature size: {}".format(features[0].size()))
   print(f"Number of obs: {len(features)}")
-  print(f"Type of features: {type(features)}")
-  print(f"Shape of one obs: {features[0].size()}")
   labels = getLabels(df_timestamps, df_diag_acts)
   print("Labels size: {}".format(len(labels)))
-  print("Rows timestamps (should match number of obs): ", df_timeshapes.shape[0])
+  p['# obs'] = len(labels)
+  p['# interp.s'] = sum(labels)
+  p['feature size'] = features[0].size(1)*features[0].size(2)
+  print("Rows timestamps: ", df_timeshapes.shape[0])
+
 
   if AWS:
-    data_key = 'dataset-2.pkl'
+    data_key = 'dataset-4.pkl'
     bucket = 'ai4good-m6-2022'
     data_2 = dataset(features, df_timestamps, labels)
     
@@ -56,7 +58,7 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p):
     s3_resource.Object(bucket,key).put(Body=pickle_data_32)
 
   else:
-    dataset_path = './processed-data/whole-dataset.pkl'
+    dataset_path = './processed-data/dataset-4.pkl'
     with open(dataset_path, 'wb') as f:
           print("Writing to {}".format(dataset_path))
           pickle.dump(data_whole, f)
@@ -138,7 +140,8 @@ def getInputSegmentTimes(audio_file, segment_length, overlap_length):
       list_of_timestamps.append([meeting_id,i,i+segment_length])
 
     df_timestamps = pd.DataFrame(list_of_timestamps, columns=['meeting_id','st_time','ed_time'])
-
+    df_timestamps = df_timestamps.reset_index(level=0)
+    df_timestamps["seg_id"] = df_timestamps["meeting_id"]+ df_timestamps["index"].astype(str)
     return df_timestamps
 
 def getInputSegments(audio_file, df_timestamps, rootPath, AWS=False):
@@ -189,12 +192,12 @@ def getFeatures(segment_paths, df_timestamps, p, AWS=False):
 
   df_timestamps.reset_index(inplace=True)
 
-  for idx, segment in enumerate(segments):
+  for idx, segment in enumerate(segment_paths):
     signal, sr = librosa.load(segment, sr=None)
     if signal is None or len(signal) == 0:
       print(f"segment {idx} didn't exist or was empty.")
       df_timestamps = df_timestamps.drop([idx])
-    elif idx == (len(segments)-1):
+    elif idx == (len(segment_paths)-1):
       df_timestamps = df_timestamps[:-1]
     else:
       melspect = librosa.feature.melspectrogram(signal, n_fft = p["nfft"], hop_length = p["hop_length"], win_length = p["win_length"], n_mels = p["n_mels"])
@@ -289,14 +292,17 @@ def getLabels(df_timestamps, df_diag_acts):
   print("Getting labels")
   print("-----------------------------------")
   counts = np.zeros(df_timestamps.shape[0])
+  seg_index = 0 # don't use the index fromdf.iterrows(), they are non-unique segment id's
+  df_diag_acts.reset_index(inplace=True)
   for diag_acts_index, diag_acts_row in df_diag_acts.iterrows():
     #print("df_timestamps row length", seg_index)
-    for seg_index, seg_row in df_timestamps.iterrows():
+    for _, seg_row in df_timestamps.iterrows():
       if seg_row['meeting_id'] != diag_acts_row['meeting_id']:
         continue
       elif seg_row['st_time'] < diag_acts_row['st_time'] and seg_row['ed_time'] > diag_acts_row['ed_time']:
-        counts[seg_index] += 1
+        
         print(f"Found segment for iterruption {diag_acts_index}: {seg_index}")
+        counts[seg_index] += 1
         counts[seg_index] = 1
       else: None
 

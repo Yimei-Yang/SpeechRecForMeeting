@@ -28,7 +28,7 @@ print("External packages imported\n")
 
 # Select where you are running this script -----------------#
 
-s3 = False
+AWS = False
 google = False
 if google:
     from google.colab import drive
@@ -62,17 +62,24 @@ from CNN import *
 with open('dialogue-acts-prepped.pkl','rb') as f:
         df_diag_acts = pickle.load(f)
 
+with open('processed-data/df_timestamps.pkl','rb') as f:
+        df_timestamps = pickle.load(f)
+
+# Get segment ids from df_timestamps
+idx = df_timestamps.index
+seg_ids = [df_timestamps['meeting_id'][j] + '_' + str(j) for j in idx]
+
+# Prepare dataset
 # [segment_full_paths, df_timestamps] = processSignals("Signals-new-10", rootPath)
-df_timestamps
-prepareDataset(segment_paths, df_diag_acts, df_timestamps, p)
+p = {'segment length': 10, 'overlap length': 1}
+dataset_path, p = prepareDataset(segment_paths, df_diag_acts, df_timestamps, p, AWS)
 
 # device = "cuda" if torch.cuda.is_available() else "cpu"
 # kwargs = {'num_workers': 1, 'pin_memory': True} if device=='cuda' else {}
 
 ## Load dataset ##
-p = {'segment length': 10, 'overlap length': 1}
-DATA_PATH = rootPath + "/processed-data"
-pickle_file = DATA_PATH + "/dataset-10M.pkl"
+
+pickle_file = rootPath + "/processed-data" + "/dataset-10M.pkl"
 train_dataloader, val_dataloader, test_dataloader, p = prepareData(pickle_file)
 examineBatches(train_dataloader, val_dataloader, test_dataloader)
 
