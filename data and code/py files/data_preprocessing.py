@@ -47,19 +47,20 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p, AWS=False):
   p['feature size'] = features[0].size(1)*features[0].size(2)
   print("Rows timestamps: ", df_timestamps.shape[0])
 
-  data_4 = dataset(features, labels, p, df_timestamps)
+  data = dataset(features, labels, p, df_timestamps)
+
   if AWS:
-    data_key = 'dataset-4.pkl'
+    data_key = 'dataset-3.pkl'
     bucket = 'ai4good-m6-2022'
     pickle_data = pickle.dumps(data) 
     s3_resource = boto3.resource('s3')
     s3_resource.Object(bucket,key).put(Body=pickle_data_32)
 
   else:
-    dataset_path = './processed-data/dataset-4.pkl'
+    dataset_path = './processed-data/dataset-3.pkl'
     with open(dataset_path, 'wb') as f:
           print("Writing to {}".format(dataset_path))
-          pickle.dump(data_4, f)
+          pickle.dump(data, f)
     # -------------------------------------------------------
   
   return dataset_path, p
