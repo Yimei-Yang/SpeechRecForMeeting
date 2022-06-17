@@ -50,14 +50,14 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p, AWS=False):
   data = dataset(features, labels, p, df_timestamps)
 
   if AWS:
-    data_key = 'dataset-3.pkl'
+    data_key = 'dataset-3-a.pkl'
     bucket = 'ai4good-m6-2022'
     pickle_data = pickle.dumps(data) 
     s3_resource = boto3.resource('s3')
     s3_resource.Object(bucket,key).put(Body=pickle_data_32)
 
   else:
-    dataset_path = './processed-data/dataset-3.pkl'
+    dataset_path = './processed-data/dataset-3-a.pkl'
     with open(dataset_path, 'wb') as f:
           print("Writing to {}".format(dataset_path))
           pickle.dump(data, f)
@@ -182,9 +182,9 @@ def getFeatures(segment_paths, df_timestamps, p, AWS=False):
   '''
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
   '''
-  p["melspec: nfft"] = 400
-  p["melspec: hop length"] = 200
-  p["melspec: win length"] = 400
+  p["melspec: nfft"] = 800
+  p["melspec: hop length"] = 400
+  p["melspec: win length"] = 800
   p["melspec: fmax"] = 400
   p["melspec: n mels"] = 16
   print("-----------------------------------")
