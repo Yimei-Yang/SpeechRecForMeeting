@@ -62,9 +62,9 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p):
           pickle.dump(data_whole, f)
     # -------------------------------------------------------
   
-  return dataset_path
+  return dataset_path, p
 
-def processSignals(signals_folder, rootPath):
+def processSignals(signals_folder, rootPath, AWS=False):
   '''
   inputs path (str) to 
   '''
@@ -211,6 +211,8 @@ def getFeatures(segment_paths, df_timestamps, p, AWS=False):
       df_timestamps = df_timestamps.drop([idx])
       print(f"Incorrect feature shape found: {x.size()}")
   print(f"features is a {type(features)} with {len(features)} elements: {features[0].size()}")
+
+  return features, df_timestamps, p
 
 def dialogueActsXMLtoPd(pathToDialogueActs):
   '''
