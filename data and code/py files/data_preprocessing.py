@@ -187,6 +187,7 @@ def getFeatures(segment_paths, df_timestamps, p, AWS=False):
   p["melspec: win length"] = 800
   p["melspec: fmax"] = 400
   p["melspec: n mels"] = 16
+  
   print("-----------------------------------")
   print("Getting features")
   print("-----------------------------------")
@@ -197,14 +198,14 @@ def getFeatures(segment_paths, df_timestamps, p, AWS=False):
   df_timestamps.reset_index(inplace=True, drop=True)
 
   for idx, segment in enumerate(segment_paths):
-    signal, sr = librosa.load(segment, sr=None)
+    signal, p['melspec: sr'] = librosa.load(segment, sr=None)
     if signal is None or len(signal) == 0:
       print(f"segment {idx} didn't exist or was empty.")
       df_timestamps = df_timestamps.drop([idx])
     elif idx == (len(segment_paths)-1):
       df_timestamps = df_timestamps[:-1]
     else:
-      melspect = librosa.feature.melspectrogram(signal, n_fft = p["melspec: nfft"], hop_length = p["melspec: hop length"], win_length = p["melspec: win length"], n_mels = p["melspec: n mels"])
+      melspect = librosa.feature.melspectrogram(signal, sr=p['melspec: sr'], n_fft = p["melspec: nfft"], hop_length = p["melspec: hop length"], win_length = p["melspec: win length"], fmax= p["melspec: fmax"],n_mels = p["melspec: n mels"])
       feat = torch.Tensor(melspect)
       feat = feat.reshape(1, melspect.shape[0],melspect.shape[1])
       features.append(feat)
