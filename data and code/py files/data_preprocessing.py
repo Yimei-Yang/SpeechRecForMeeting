@@ -13,7 +13,6 @@ import glob, os
 import librosa
 import pickle
 
-import torch
 from torch.utils.data import Dataset
 
 
@@ -39,48 +38,64 @@ class dataset(Dataset):
 def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p):
 
   features, df_timestamps, p = getFeatures(segment_paths, df_timestamps, p)
+  print("Feature size: {}".format(features.size))
   print(f"Number of obs: {len(features)}")
   print(f"Type of features: {type(features)}")
   print(f"Shape of one obs: {features[0].size()}")
   labels = getLabels(df_timestamps, df_diag_acts)
   print("Labels size: {}".format(len(labels)))
+  print("Rows timestamps (should match number of obs): ", df_timeshapes.shape[0])
 
-  dataset_path = './processed-data/dataset-1.pkl'
-  ds = dataset(features, labels, p=p, df_timestamps=df_timestamps)
+  if AWS:
+    data_key = 'dataset-2.pkl'
+    bucket = 'ai4good-m6-2022'
+    data_2 = dataset(features, df_timestamps, labels)
+    
+    pickle_data_32 = pickle.dumps(data_2) 
+    s3_resource = boto3.resource('s3')
+    s3_resource.Object(bucket,key).put(Body=pickle_data_32)
 
-  print(f"Number of labels: {len(labels)}")
-  print(f"Type of labels: {type(labels)}")
-
-  ds.p['num of features'] = len(ds.features)
-  ds.p['feature shape'] = len(ds.features[0].size())
-  ds.p['num of labels'] = len(ds.labels)
-  ds.p['num of interruptions'] = sum(ds.labels)
-  print(ds.p)
-
-  with open(dataset_path, 'wb') as f:
-    print("Writing to {}".format(dataset_path))
-    pickle.dump(ds, f)
+  else:
+    dataset_path = './processed-data/whole-dataset.pkl'
+    with open(dataset_path, 'wb') as f:
+          print("Writing to {}".format(dataset_path))
+          pickle.dump(data_whole, f)
+    # -------------------------------------------------------
+  
   return dataset_path
 
 def processSignals(signals_folder, rootPath):
   '''
   inputs path (str) to 
   '''
+  print("-----------------------")
+  print("------Processing signals -------")
+  print("-----------------------")
   p = {}
+
   p['segment_length'] = 10 # must be an int
   p['overlap_length'] = 1 # must be an int
 
-  os.chdir(signals_folder)
-  df_timestamps = pd.DataFrame(columns=['meeting_id','st_time','ed_time'])
+  df_timestamps = df_timestamps = pd.DataFrame(columns=['meeting_id','st_time','ed_time'])
   segments_path = []
-  for audio_file in glob.glob('*.wav'):
+
+  # Fix
+  if AWS:
+    signals_paths = glob.glob('./75_whole_meetings/*.wav')
+    print("Number of signals: ", len(signals_paths))
+  else:
+    signals_paths = glob.glob('./Signals/*.wav')
+    print("Number of signals: ", len(signals_paths))
+
+  
+  for audio_file in signals_paths:
     df_timestamps_t = getInputSegmentTimes(audio_file, segment_length, overlap_length)
     segments_paths_t = getInputSegments(audio_file, df_timestamps_t, rootPath)
     df_timestamps = df_timestamps.append(df_timestamps_t)
     segments_path.append(segments_paths_t)
     print(f"{audio_file} segmented.\n")
 
-  os.chdir(rootPath)
+  # segment_full_paths = [rootPath + "/segments-viv/" + s for s in segments_path]
 
   print("Number of segments: {}".format(len(segments_path)))
   print("df_timestamps shape: {}".format(df_timestamps.shape))
@@ -91,7 +106,7 @@ def processDialogueActs(path2all_xml_files):
   df_diag_acts = dialogueActsXMLtoPd(path2all_xml_files) # rootPath + '/dialogue-acts/*.xml'
   df_diag_acts = addDAoIVariable(df_diag_acts)
   df_diag_acts = df_diag_acts[df_diag_acts.DAoI]
-  diag_acts_path = './processed-data/dialogue-acts-prepped.pkl'
+  diag_acts_path = 'dialogue-acts-prepped.pkl'
 
   with open(diag_acts_path, 'wb') as f:
     print("Writing to {}".format(diag_acts_path))
@@ -126,7 +141,7 @@ def getInputSegmentTimes(audio_file, segment_length, overlap_length):
 
     return df_timestamps
 
-def getInputSegments(audio_file, df_timestamps, rootPath):
+def getInputSegments(audio_file, df_timestamps, rootPath, AWS=False):
     '''
     input: path to audio_file, df_timestamps['meeting_id','st_time','ed_time']
     output: list of paths to segment file names
@@ -147,7 +162,7 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
       #print("segmented")
       count = count + 1
       
-      segment_path = "{}/segments-viv/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
+      segment_path = "{}/segments-new-10/{}_{}.wav".format(dataPath, df_timestamps['meeting_id'][idx], count)
       absPath = os.path.abspath(segment_path)
       #print("Ready to export to: {}".format(absPath))
     # os.makedirs("./segments_viv") (not working, we created the folder manually)
@@ -156,7 +171,7 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
 
     return segments
 
-def getFeatures(segment_paths, df_timestamps, p):
+def getFeatures(segment_paths, df_timestamps, p, AWS=False):
   '''
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
   '''
@@ -170,50 +185,32 @@ def getFeatures(segment_paths, df_timestamps, p):
   print("-----------------------------------")
   print("Number of segments: {}".format(len(segment_paths)))
   features = []
-  #print(df_timestamps.describe)
-  #print("timestamp length", df_timestamps.shape[0])
-  #print(df_timestamps.iloc[:, 0])
+  result = []
+
   df_timestamps.reset_index(inplace=True)
-  #print(df_timestamps.iloc[:, 0])
-  #print(df_timestamps.loc[[792]])
-  
-  for idx, segment in enumerate(segment_paths):
 
+  for idx, segment in enumerate(segments):
     signal, sr = librosa.load(segment, sr=None)
-
     if signal is None or len(signal) == 0:
       print(f"segment {idx} didn't exist or was empty.")
       df_timestamps = df_timestamps.drop([idx])
+    elif idx == (len(segments)-1):
+      df_timestamps = df_timestamps[:-1]
     else:
       melspect = librosa.feature.melspectrogram(signal, n_fft = p["nfft"], hop_length = p["hop_length"], win_length = p["win_length"], n_mels = p["n_mels"])
       feat = torch.Tensor(melspect)
       feat = feat.reshape(1, melspect.shape[0],melspect.shape[1])
       features.append(feat)
       print(f"Computed feature for segment {segment}")
-      
-  #print("length of the features", len(features))
   if len(features) > 0:
     shape = features[0].size()
     print(f"Shape of one feature: {shape}")
   else: print("No features in list")
-
   for idx,x in enumerate(features):
     if not x.size()==shape:
       df_timestamps = df_timestamps.drop([idx])
       print(f"Incorrect feature shape found: {x.size()}")
-  print(f"ds.features is a {type(features)}")
-  print(f"ds has {len(features)} features")
-  # features = np.stack(features)
-  # features = torch.Tensor(features)
-  # features = features.reshape(features.shape[0], 1, features.shape[1], features.shape[2])
-  
-  #print(features.shape)
-  #print("length of feature list", features.shape[0])
-  #print(features[0][0].shape)
-  #print("length of timestamps", df_timestamps.shape[0])
-  # df_timestamps.reset_index(inplace=True)
-
-  return features, df_timestamps, p
+  print(f"features is a {type(features)} with {len(features)} elements: {features[0].size()}")
 
 def dialogueActsXMLtoPd(pathToDialogueActs):
   '''
@@ -281,6 +278,7 @@ def addDAoIVariable(df_diag_acts):
   return df_diag_acts
 
 def getLabels(df_timestamps, df_diag_acts):
+
   '''
   input: df_timestamps[], df_diag_acts['meeting_id','st_time','ed_time']
   output: boolean vector with the same number of rows as df_timestamps
@@ -300,11 +298,9 @@ def getLabels(df_timestamps, df_diag_acts):
         counts[seg_index] = 1
       else: None
 
-  
   labels = np.empty(len(counts))
   for idx in range(len(counts)):
     if counts[idx] == 0:
       labels[idx] = 0
     else: labels[idx] = 1
   return labels
-

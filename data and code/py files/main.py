@@ -28,7 +28,7 @@ print("External packages imported\n")
 
 # Select where you are running this script -----------------#
 
-s3 = True
+s3 = False
 google = False
 if google:
     from google.colab import drive
@@ -36,7 +36,6 @@ if google:
     os.chdir("/content/drive/My Drive/Team 6")
     rootPath = "/content/drive/My Drive/Team 6"
     dataPath = rootPath
-
 
 else:
     rootPath = '/speechRecForMeeting'
@@ -60,11 +59,10 @@ from CNN import *
 
 ## Data pre-processing ##
 
+with open('dialogue-acts-prepped.pkl','rb') as f:
+        df_diag_acts = pickle.load(f)
 
-with contextlib.closing(wave.open('dialogue-acts-prepped.pkl','r')) as f:
-        df_diag_acts = pd.load(f)
-
-[segment_full_paths, df_timestamps] = processSignals("Signals-10M", rootPath)
+[segment_full_paths, df_timestamps] = processSignals("Signals-new-10M", rootPath)
 prepareDataset(segment_paths, df_diag_acts, df_timestamps, p)
 
 # device = "cuda" if torch.cuda.is_available() else "cpu"
