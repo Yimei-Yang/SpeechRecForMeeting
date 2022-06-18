@@ -12,6 +12,7 @@ import torch
 import glob, os
 import librosa
 import pickle
+from collections import Counter
 
 from torch.utils.data import Dataset
 
@@ -197,28 +198,40 @@ def getFeatures(segment_paths, df_timestamps, p, AWS=False):
   result = []
 
   df_timestamps.reset_index(inplace=True, drop=True)
+  print("df_timestamps index counter: ", Counter(df_timestamps.index))
+  print("df_timestamps 'index' counter: ", print(Counter(df_timestamps['index'])))
+  print("df_timestamps 'index' counter: ", print(Counter(df_timestamps['index'])))
 
   for idx, segment in enumerate(segment_paths):
     signal, p['melspec: sr'] = librosa.load(segment, sr=None)
+
+    if idx == 1: # use the first feature to get the size that all other features should be
+      shape = features[0].size()
+      print(f"Shape of one feature: {shape}")
+    
     if signal is None or len(signal) == 0:
       print(f"segment {idx} didn't exist or was empty.")
-      df_timestamps = df_timestamps.drop([idx])
-    elif idx == (len(segment_paths)-1):
-      df_timestamps = df_timestamps[:-1]
+      # df_timestamps = df_timestamps.drop([idx])
+
+    # elif idx == (len(segment_paths)-1):
+    #   df_timestamps = df_timestamps[:-1]
     else:
       melspect = librosa.feature.melspectrogram(signal, sr=p['melspec: sr'], n_fft = p["melspec: nfft"], hop_length = p["melspec: hop length"], win_length = p["melspec: win length"], fmax= p["melspec: fmax"],n_mels = p["melspec: n mels"])
       feat = torch.Tensor(melspect)
       feat = feat.reshape(1, melspect.shape[0],melspect.shape[1])
+      if idx > 0 and feat.size != shape:
+        print(f"Incorrect feature shape: {df_timestamps['seg_id']} {idx} {feat.size()}")
+        df_timestamps.drop([idx])
+        df_timestamps = df_timestamps.drop([idx])
+
       features.append(feat)
-      # print(f"Computed feature for segment {segment}")
-  if len(features) > 0:
-    shape = features[0].size()
-    print(f"Shape of one feature: {shape}")
-  else: print("No features in list")
-  for idx,x in enumerate(features):
-    if not x.size()==shape:
-      df_timestamps = df_timestamps.drop([idx])
-      print(f"Incorrect feature shape found: {x.size()}")
+      # print(f"Computed feature for segment {segment}")    
+
+  # for idx,x in enumerate(features):
+  #   if not x.size()==shape:
+  #     df_timestamps = df_timestamps.drop([idx])
+  #     features.remove(x)
+  #     print(f"Incorrect feature shape found: {x.size()}")
   print(f"features is a {type(features)} with {len(features)} elements: {features[0].size()}")
   print(f"Number of features and df_timestamps are the same:  {len(features) == df_timestamps.shape[0]}")
   return features, df_timestamps, p
@@ -272,8 +285,6 @@ def selectSample(label_list, df_timestamps, feature_list):
     if label == 1:
       interrupted_list.append((feature_list[idx],1))
       df_timestamps_in.append(df_timestamps.loc[idx])
-    # elif idx == (len(segments)-1):
-    #   df_timestamps = df_timestamps[:-1]
     else:
       uninterrupted_list.append((feature_list[idx],0))
       df_timestamps_un.append(df_timestamps.loc[idx])
