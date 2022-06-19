@@ -51,5 +51,9 @@ fig.savefig("interp_freq_plot.png")
 df_count.groupby(['Gender']).count()
 
 # %%
+from scipy import stats
+
+# stats.ranksums(df_count['count'][df_count['Gender']=='f'], df_count['count'][df_count['Gender']=='m'])
+
 
 # %%

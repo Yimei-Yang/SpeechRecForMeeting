@@ -1,4 +1,5 @@
 
+# %%
 import glob, os, sys, contextlib, re
 # import xml.etree.ElementTree as et
 from pathlib import Path
@@ -22,9 +23,11 @@ import pickle
 # from getpass import getpass
 
 from pydub import AudioSegment
-import wave, librosa
+import wave
 print(f"Running in {os.getcwd()}")
 print("External packages imported\n")
+
+# %%
 
 # Select where you are running this script -----------------#
 
@@ -40,15 +43,13 @@ if google:
 else:
     rootPath = '/speechRecForMeeting'
     dataPath = ''
-
+# %%
 # -----------------------------------------------------------
 
 from data_preprocessing import *
 
 # # DagsHub set-up --------------------------------
-# os.environ['MLFLOW_TRACKING_USERNAME'] = 'team-token'
-# os.environ['MLFLOW_TRACKING_PASSWORD'] = 'f01653d37636d9488c48cd922f6ab83881d2cf4a'
-# os.environ['MLFLOW_TRACKING_PROJECTNAME'] = 'speechRecForMeeting'
+
 
 # mlflow.set_tracking_uri(f'https://dagshub.com/Viv-Crowe/speechRecForMeeting.mlflow')
 
@@ -77,13 +78,13 @@ dataset_path, p = prepareDataset(segment_paths, df_diag_acts, df_timestamps, p, 
 # device = "cuda" if torch.cuda.is_available() else "cpu"
 # kwargs = {'num_workers': 1, 'pin_memory': True} if device=='cuda' else {}
 
-## Load dataset ##
+## Load dataset ----------------------------------##
 
 pickle_file = rootPath + "/processed-data" + "/dataset-10M.pkl"
 train_dataloader, val_dataloader, test_dataloader, p = prepareData(pickle_file)
 examineBatches(train_dataloader, val_dataloader, test_dataloader)
 
-## Train dataset ##
+## Train dataset ----------------------------------##
 CNN = initialize()
 criterion = nn.CrossEntropyLoss()
 p['lr'] = 0.01
